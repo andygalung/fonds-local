@@ -1,400 +1,424 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard Prioritas PKS')
-@section('page-title', 'Dashboard Prioritas Nilai & Paket Investasi')
-@section('page-subtitle', 'OFF FARM REKG 045 PKS dan PPIS PT Perkebunan Nusantara IV Regional I')
+@section('title', 'Dashboard Investasi')
 
 @section('content')
 
-{{-- ─── Fullscreen Nav Menu & Controls ────────────────────────────────────────── --}}
-<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
-    {{-- On-screen Navigation Menu --}}
-    <div class="flex items-center gap-1 bg-white/80 backdrop-blur-md border border-slate-200 p-1 rounded-xl shadow-sm">
-        <a href="{{ route('dashboard') }}" class="nav-btn px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg flex items-center gap-1.5 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            DASHBOARD
-        </a>
-        <a href="{{ route('investasi.index') }}" class="nav-btn px-3 py-1.5 text-xs font-bold text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg flex items-center gap-1.5 transition">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-            INVESTASI
-        </a>
-        <a href="{{ route('prioritas.index') }}" class="nav-btn px-3 py-1.5 text-xs font-bold text-primary-700 bg-primary-50 rounded-lg flex items-center gap-1.5 transition shadow-sm border border-primary-100">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-            PRIORITAS PKS
-        </a>
-    </div>
+@php
+    $records = $data['records'] ?? [];
+@endphp
 
+@push('styles')
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --slate-950: #0f172a;
+        --slate-900: #1e293b;
+        --slate-800: #334155;
+        --blue-500: #3b82f6;
+        --emerald-500: #10b981;
+        --amber-500: #f59e0b;
+        --rose-500: #f43f5e;
+        --indigo-500: #6366f1;
+        --text-100: #f1f5f9;
+        --text-400: #94a3b8;
+        --border-subtle: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+        background-color: var(--slate-950) !important;
+        color: var(--text-100) !important;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        overflow-x: hidden !important;
+    }
+
+    /* Fullscreen Mode - Hide App UI */
+    #sidebar, header, footer { display: none !important; }
+
+    #main-content {
+        background-color: var(--slate-950) !important;
+        margin-left: 0 !important;
+        width: 100vw !important;
+        height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+    }
+
+    main {
+        padding: 1.5rem !important;
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+    }
+
+    /* Page Header */
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .brand-box {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .brand-icon {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--blue-500), var(--indigo-500));
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+    }
+
+    .brand-text h1 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        letter-spacing: -0.025em;
+        margin: 0;
+        background: linear-gradient(to right, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .brand-text p {
+        font-size: 0.8rem;
+        color: var(--text-400);
+        margin: 0;
+    }
+
+    /* Action Buttons */
+    .btn-action {
+        background: var(--slate-900);
+        border: 1px solid var(--slate-800);
+        color: #fff;
+        padding: 0.6rem 1.2rem;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+        background: var(--slate-800);
+        transform: translateY(-1px);
+    }
+
+    .btn-primary-blue {
+        background: var(--blue-500);
+        border: none;
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-primary-blue:hover {
+        background: #2563eb;
+        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    }
+
+    /* Main Table Container */
+    .data-card {
+        background: var(--slate-900);
+        border-radius: 20px;
+        border: 1px solid var(--slate-800);
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-height: 0;
+        overflow: hidden;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+
+    .table-header-toolbar {
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .table-scroller {
+        flex: 1;
+        overflow: auto;
+        position: relative;
+    }
+
+    /* Table Professional Styling */
+    #prioritas-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        font-size: 11px;
+    }
+
+    /* Header Grouping & Coloring */
+    #prioritas-table thead th {
+        background: var(--slate-900);
+        color: var(--text-400);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 12px 10px;
+        border-right: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border-subtle);
+        position: sticky;
+        top: 0;
+        z-index: 30;
+    }
+
+    /* Colored accents for each stage section */
+    .stage-rkap { border-top: 3px solid var(--amber-500) !important; color: var(--amber-500) !important; }
+    .stage-doku { border-top: 3px solid var(--blue-500) !important; color: var(--blue-500) !important; }
+    .stage-tekpol { border-top: 3px solid var(--emerald-500) !important; color: var(--emerald-500) !important; }
+    .stage-hps { border-top: 3px solid var(--indigo-500) !important; color: var(--indigo-500) !important; }
+    .stage-sppbj { border-top: 3px solid var(--rose-500) !important; color: var(--rose-500) !important; }
+    .stage-pct { border-top: 3px solid var(--text-400) !important; color: var(--text-100) !important; }
+
+    #prioritas-table thead tr:nth-child(2) th { top: 43px; }
+    #prioritas-table thead tr:nth-child(3) th { top: 78px; font-size: 9px; color: var(--text-400); }
+
+    /* Sticky Column */
+    #prioritas-table .sticky-col {
+        position: sticky;
+        left: 0;
+        z-index: 40;
+        background: var(--slate-900);
+        min-width: 220px;
+        max-width: 220px;
+        border-right: 2px solid var(--slate-800);
+        text-align: left;
+        padding-left: 1.5rem;
+    }
+
+    #prioritas-table thead .sticky-col { z-index: 50; }
+
+    /* Table Body */
+    #prioritas-table td {
+        padding: 10px;
+        border-right: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border-subtle);
+        white-space: nowrap;
+        color: var(--text-100);
+    }
+
+    #prioritas-table tbody tr:hover td {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+
+    /* Subtotal / Regional Rows */
+    .row-total {
+        background-color: rgba(59, 130, 246, 0.1) !important;
+        font-weight: 800;
+    }
+    .row-total td { color: var(--blue-500) !important; }
+    .row-total .sticky-col { background-color: #1e293b !important; }
+
+    /* Data Formatting */
+    .num-font { font-family: 'JetBrains Mono', monospace; text-align: right; }
+    .dim-zero { color: #334155; }
+    
+    /* Progress Pills */
+    .pct-pill {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-weight: 700;
+        font-size: 10px;
+        min-width: 55px;
+        text-align: center;
+    }
+    .pill-high { background: rgba(16, 185, 129, 0.1); color: var(--emerald-500); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .pill-mid { background: rgba(245, 158, 11, 0.1); color: var(--amber-500); border: 1px solid rgba(245, 158, 11, 0.2); }
+    .pill-low { background: rgba(244, 63, 94, 0.1); color: var(--rose-500); border: 1px solid rgba(244, 63, 94, 0.2); }
+
+    /* Column Sizing */
+    .w-biaya { min-width: 100px; width: 100px; }
+    .w-paket { min-width: 45px; width: 45px; }
+    .w-pct { min-width: 80px; width: 80px; text-align: center; }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--slate-950); }
+    ::-webkit-scrollbar-thumb { background: var(--slate-800); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--slate-700); }
+</style>
+@endpush
+
+<div class="dashboard-header">
+    <div class="brand-box">
+        <div class="brand-icon">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div class="brand-text">
+            <h1>INVESTASI</h1>
+            <p>Monitoring harian progres realisasi investasi unit kerja.</p>
+        </div>
+    </div>
     <div class="flex items-center gap-3">
-        <div class="text-right">
-            <h2 class="text-[13px] font-bold text-slate-800 uppercase tracking-wide leading-tight">{{ $data['title'] ?? 'DASHBOARD PRIORITAS' }}</h2>
-            <p class="text-[10px] text-slate-500 font-medium">Data: {{ $data['date'] ?? '-' }} • {{ count($data['records']) }} unit kerja</p>
-        </div>
-
-        {{-- Controls --}}
-        <div class="flex gap-2">
-            <button id="btn-toggle-pct" onclick="togglePctCols()"
-                    class="flex items-center gap-1.5 text-xs font-semibold bg-white text-slate-600 px-3 py-2 border border-slate-200 rounded-lg hover:bg-slate-50 transition shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                </svg>
-                <span id="btn-toggle-pct-label">Sembunyikan %</span>
-            </button>
-            <a href="{{ route('prioritas.index', ['refresh' => 1]) }}"
-               id="btn-refresh"
-               class="flex items-center gap-1.5 text-xs font-semibold bg-primary-800 text-white px-3 py-2 rounded-lg border border-primary-900 hover:bg-primary-700 transition shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
-                </svg>
-                Refresh
-            </a>
-        </div>
+        <a href="{{ route('dashboard') }}" class="btn-action">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Kembali
+        </a>
+        <a href="{{ route('prioritas.index', ['refresh' => 1]) }}" class="btn-action btn-primary-blue">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Refresh Data
+        </a>
     </div>
 </div>
 
-{{-- ─── Error Alert ────────────────────────────────────────────────────────── --}}
-@if($error)
-<div class="bg-red-50 border border-red-200 rounded-xl p-4 mb-4 flex items-start gap-3">
-    <svg class="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-    </svg>
-    <div>
-        <p class="text-sm font-semibold text-red-700">Gagal memuat data</p>
-        <p class="text-xs text-red-600 mt-0.5">{{ $error }}</p>
+<div class="data-card">
+    <div class="table-header-toolbar">
+        <div class="flex items-center gap-3">
+            <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
+            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Monitoring Unit Kerja</span>
+        </div>
+        <button onclick="togglePctCols()" class="btn-action">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            Toggle Persentase
+        </button>
     </div>
-</div>
-@endif
 
-{{-- ─── Legend ─────────────────────────────────────────────────────────────── --}}
-<div class="flex flex-wrap items-center gap-3 mb-3 text-xs">
-    <span class="flex items-center gap-1.5"><span class="w-4 h-3 rounded inline-block bg-amber-100 border border-amber-300"></span> RKAP 2026</span>
-    <span class="flex items-center gap-1.5"><span class="w-4 h-3 rounded inline-block bg-sky-100 border border-sky-300"></span> Dokumen di Unit</span>
-    <span class="flex items-center gap-1.5"><span class="w-4 h-3 rounded inline-block bg-teal-100 border border-teal-300"></span> Sudah Diajukan (Tekpol)</span>
-    <span class="flex items-center gap-1.5"><span class="w-4 h-3 rounded inline-block bg-violet-100 border border-violet-300"></span> HPS/Pengadaan</span>
-    <span class="flex items-center gap-1.5"><span class="w-4 h-3 rounded inline-block bg-rose-100 border border-rose-300"></span> SPPBJ/Kontrak</span>
-    <span class="flex items-center gap-1.5"><span class="w-4 h-3 rounded inline-block bg-slate-700 border border-slate-800"></span> % Progress RKAP</span>
-    <span class="ml-auto text-slate-400 font-mono">Biaya dalam satuan Rp (ribu)</span>
-</div>
-
-{{-- ─── Main Table ─────────────────────────────────────────────────────────── --}}
-@if(empty($data['records']))
-<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-16 text-center">
-    <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-    </svg>
-    <p class="text-slate-500 font-medium">Tidak ada data</p>
-    <p class="text-slate-400 text-xs mt-1">Coba klik Refresh Data untuk memuat ulang dari Google Sheets</p>
-</div>
-@else
-
-<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex-1 flex flex-col" style="min-height: 0;">
-    <div class="overflow-x-auto flex-1 h-full" style="overflow-y: auto;">
-        <table id="prioritas-table" class="text-xs border-collapse" style="min-width: 3600px; table-layout: fixed;">
-            {{-- ══════════════════════════════════════════════════════════════ --}}
-            {{-- HEADER ROW 1: Master Group Labels                             --}}
-            {{-- ══════════════════════════════════════════════════════════════ --}}
-            <thead class="sticky top-0 z-30">
-                <tr class="text-white text-center font-bold text-[10px]">
-                    {{-- Unit Kerja --}}
-                    <th rowspan="3"
-                        class="px-2 py-2 text-left align-middle bg-primary-900 border border-white/20 min-w-[160px] w-[160px] sticky left-0 z-40">
-                        Unit Kerja<br><span class="font-normal">(Pabrik / Kebun)</span>
-                    </th>
-
-                    {{-- RKAP 2026 Rekg 045 Setahun (Prioritas) --}}
-                    <th colspan="8"
-                        class="px-2 py-1 bg-amber-600 border border-white/20 text-center">
-                        RKAP 2026 Rekg 045 Setahun (Prioritas)
-                    </th>
-
-                    {{-- Dokumen di Unit --}}
-                    <th colspan="8"
-                        class="px-2 py-1 bg-sky-700 border border-white/20 text-center">
-                        Dokumen di Unit
-                    </th>
-
-                    {{-- Sudah diajukan Unit (Bag Tekpol) --}}
-                    <th colspan="8"
-                        class="px-2 py-1 bg-teal-700 border border-white/20 text-center">
-                        Sudah diajukan Unit (Bag Tekpol)
-                    </th>
-
-                    {{-- HPS/Pengadaan --}}
-                    <th colspan="8"
-                        class="px-2 py-1 bg-violet-700 border border-white/20 text-center">
-                        HPS/Pengadaan
-                    </th>
-
-                    {{-- SPPBJ/Kontrak --}}
-                    <th colspan="8"
-                        class="px-2 py-1 bg-rose-700 border border-white/20 text-center">
-                        SPPBJ/Kontrak
-                    </th>
-
-                    {{-- % Progress Thd RKAP setahun --}}
-                    <th colspan="8" class="pct-col px-2 py-1 bg-slate-700 border border-white/20 text-center w-[480px]">
-                        % Progress Thd RKAP setahun (%)
-                    </th>
+    <div class="table-scroller">
+        <table id="prioritas-table">
+            <thead>
+                <tr>
+                    <th rowspan="3" class="sticky-col">Unit Kerja</th>
+                    <th colspan="8" class="stage-rkap">RKAP 2026 Setahun</th>
+                    <th colspan="8" class="stage-doku">Dokumen di Unit</th>
+                    <th colspan="8" class="stage-tekpol">Sudah Diajukan (Tekpol)</th>
+                    <th colspan="8" class="stage-hps">HPS / Pengadaan</th>
+                    <th colspan="8" class="stage-sppbj">SPPBJ / Kontrak</th>
+                    <th colspan="8" class="stage-pct pct-col">Progress Thd RKAP (%)</th>
                 </tr>
-
-                {{-- ── HEADER ROW 2: Sub-group labels ─────────────────────── --}}
-                {{-- Per grup: Σ Biaya(4 cols) | Σ Paket(4 cols) = 8 cols/grup --}}
-                <tr class="text-white text-center text-[10px]">
-                    {{-- RKAP: 4 biaya + 4 paket --}}
-                    <th colspan="4" class="px-1 py-1 bg-amber-600/90 border border-white/20">Σ Biaya (Rp)</th>
-                    <th colspan="4" class="px-1 py-1 bg-amber-700 border border-white/20">Σ Paket</th>
-                    {{-- Dokumen --}}
-                    <th colspan="4" class="px-1 py-1 bg-sky-700/90 border border-white/20">Σ Biaya (Rp)</th>
-                    <th colspan="4" class="px-1 py-1 bg-sky-800 border border-white/20">Σ Paket</th>
-                    {{-- Tekpol --}}
-                    <th colspan="4" class="px-1 py-1 bg-teal-700/90 border border-white/20">Σ Biaya (Rp)</th>
-                    <th colspan="4" class="px-1 py-1 bg-teal-800 border border-white/20">Σ Paket</th>
-                    {{-- HPS --}}
-                    <th colspan="4" class="px-1 py-1 bg-violet-700/90 border border-white/20">Σ Biaya (Rp)</th>
-                    <th colspan="4" class="px-1 py-1 bg-violet-800 border border-white/20">Σ Paket</th>
-                    {{-- SPPBJ --}}
-                    <th colspan="4" class="px-1 py-1 bg-rose-700/90 border border-white/20">Σ Biaya (Rp)</th>
-                    <th colspan="4" class="px-1 py-1 bg-rose-800 border border-white/20">Σ Paket</th>
-                    {{-- % Progress --}}
-                    <th colspan="2" class="pct-col px-1 py-1 bg-slate-700/90 border border-white/20">Diajukan Unit</th>
-                    <th colspan="2" class="pct-col px-1 py-1 bg-slate-600 border border-white/20">Belum Diajukan</th>
-                    <th colspan="2" class="pct-col px-1 py-1 bg-slate-700/90 border border-white/20">HPS/Pengadaan</th>
-                    <th colspan="2" class="pct-col px-1 py-1 bg-slate-600 border border-white/20">SPPBJ/Kontrak</th>
+                <tr>
+                    @for($i=0; $i<5; $i++)
+                        <th colspan="4">Σ Biaya (Rp)</th>
+                        <th colspan="4">Σ Paket</th>
+                    @endfor
+                    <th colspan="2" class="pct-col">Diajukan</th>
+                    <th colspan="2" class="pct-col">Belum</th>
+                    <th colspan="2" class="pct-col">HPS</th>
+                    <th colspan="2" class="pct-col">SPPBJ</th>
                 </tr>
-
-                {{-- ── HEADER ROW 3: Column numbers ────────────────────────── --}}
-                {{-- RKAP: Biaya 1,2,3,4 | Paket 1,2,3,4 (8 cols, no Σ total) --}}
-                <tr class="text-white text-center text-[10px] font-bold">
-                    {{-- RKAP Biaya 1-4 --}}
-                    <th class="px-1 py-1.5 bg-amber-600 border border-white/20 min-w-[90px]">1</th>
-                    <th class="px-1 py-1.5 bg-amber-600 border border-white/20 min-w-[90px]">2</th>
-                    <th class="px-1 py-1.5 bg-amber-600 border border-white/20 min-w-[90px]">3</th>
-                    <th class="px-1 py-1.5 bg-amber-600 border border-white/20 min-w-[70px]">4</th>
-                    {{-- RKAP Paket 1-4 --}}
-                    <th class="px-1 py-1.5 bg-amber-700 border border-white/20 min-w-[45px]">1</th>
-                    <th class="px-1 py-1.5 bg-amber-700 border border-white/20 min-w-[45px]">2</th>
-                    <th class="px-1 py-1.5 bg-amber-700 border border-white/20 min-w-[45px]">3</th>
-                    <th class="px-1 py-1.5 bg-amber-700 border border-white/20 min-w-[45px]">4</th>
-                    {{-- Dokumen Biaya 1-4 --}}
-                    <th class="px-1 py-1.5 bg-sky-700 border border-white/20 min-w-[90px]">1</th>
-                    <th class="px-1 py-1.5 bg-sky-700 border border-white/20 min-w-[90px]">2</th>
-                    <th class="px-1 py-1.5 bg-sky-700 border border-white/20 min-w-[90px]">3</th>
-                    <th class="px-1 py-1.5 bg-sky-700 border border-white/20 min-w-[70px]">4</th>
-                    {{-- Dokumen Paket 1-4 --}}
-                    <th class="px-1 py-1.5 bg-sky-800 border border-white/20 min-w-[45px]">1</th>
-                    <th class="px-1 py-1.5 bg-sky-800 border border-white/20 min-w-[45px]">2</th>
-                    <th class="px-1 py-1.5 bg-sky-800 border border-white/20 min-w-[45px]">3</th>
-                    <th class="px-1 py-1.5 bg-sky-800 border border-white/20 min-w-[45px]">4</th>
-                    {{-- Tekpol Biaya 1-4 --}}
-                    <th class="px-1 py-1.5 bg-teal-700 border border-white/20 min-w-[90px]">1</th>
-                    <th class="px-1 py-1.5 bg-teal-700 border border-white/20 min-w-[90px]">2</th>
-                    <th class="px-1 py-1.5 bg-teal-700 border border-white/20 min-w-[90px]">3</th>
-                    <th class="px-1 py-1.5 bg-teal-700 border border-white/20 min-w-[70px]">4</th>
-                    {{-- Tekpol Paket 1-4 --}}
-                    <th class="px-1 py-1.5 bg-teal-800 border border-white/20 min-w-[45px]">1</th>
-                    <th class="px-1 py-1.5 bg-teal-800 border border-white/20 min-w-[45px]">2</th>
-                    <th class="px-1 py-1.5 bg-teal-800 border border-white/20 min-w-[45px]">3</th>
-                    <th class="px-1 py-1.5 bg-teal-800 border border-white/20 min-w-[45px]">4</th>
-                    {{-- HPS Biaya 1-4 --}}
-                    <th class="px-1 py-1.5 bg-violet-700 border border-white/20 min-w-[90px]">1</th>
-                    <th class="px-1 py-1.5 bg-violet-700 border border-white/20 min-w-[90px]">2</th>
-                    <th class="px-1 py-1.5 bg-violet-700 border border-white/20 min-w-[90px]">3</th>
-                    <th class="px-1 py-1.5 bg-violet-700 border border-white/20 min-w-[70px]">4</th>
-                    {{-- HPS Paket 1-4 --}}
-                    <th class="px-1 py-1.5 bg-violet-800 border border-white/20 min-w-[45px]">1</th>
-                    <th class="px-1 py-1.5 bg-violet-800 border border-white/20 min-w-[45px]">2</th>
-                    <th class="px-1 py-1.5 bg-violet-800 border border-white/20 min-w-[45px]">3</th>
-                    <th class="px-1 py-1.5 bg-violet-800 border border-white/20 min-w-[45px]">4</th>
-                    {{-- SPPBJ Biaya 1-4 --}}
-                    <th class="px-1 py-1.5 bg-rose-700 border border-white/20 min-w-[90px]">1</th>
-                    <th class="px-1 py-1.5 bg-rose-700 border border-white/20 min-w-[90px]">2</th>
-                    <th class="px-1 py-1.5 bg-rose-700 border border-white/20 min-w-[90px]">3</th>
-                    <th class="px-1 py-1.5 bg-rose-700 border border-white/20 min-w-[70px]">4</th>
-                    {{-- SPPBJ Paket 1-4 --}}
-                    <th class="px-1 py-1.5 bg-rose-800 border border-white/20 min-w-[45px]">1</th>
-                    <th class="px-1 py-1.5 bg-rose-800 border border-white/20 min-w-[45px]">2</th>
-                    <th class="px-1 py-1.5 bg-rose-800 border border-white/20 min-w-[45px]">3</th>
-                    <th class="px-1 py-1.5 bg-rose-800 border border-white/20 min-w-[45px]">4</th>
-                    {{-- % Progress --}}
-                    <th class="pct-col px-1 py-1.5 bg-slate-700 border border-white/20 min-w-[55px]">Biaya</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-700 border border-white/20 min-w-[55px]">Paket</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-600 border border-white/20 min-w-[55px]">Biaya</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-600 border border-white/20 min-w-[55px]">Paket</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-700 border border-white/20 min-w-[55px]">Biaya</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-700 border border-white/20 min-w-[55px]">Paket</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-600 border border-white/20 min-w-[55px]">Biaya</th>
-                    <th class="pct-col px-1 py-1.5 bg-slate-600 border border-white/20 min-w-[55px]">Paket</th>
+                <tr>
+                    @for($g=0; $g<5; $g++)
+                        <th class="w-biaya">1</th><th class="w-biaya">2</th><th class="w-biaya">3</th><th class="w-biaya">4</th>
+                        <th class="w-paket">1</th><th class="w-paket">2</th><th class="w-paket">3</th><th class="w-paket">4</th>
+                    @endfor
+                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
+                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
+                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
+                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
                 </tr>
             </thead>
-
-            {{-- ══════════════════════════════════════════════════════════════ --}}
-            {{-- BODY                                                          --}}
-            {{-- ══════════════════════════════════════════════════════════════ --}}
             <tbody>
-            @foreach($data['records'] as $row)
-            @php
-                $isSub  = $row['_is_subtotal'];
-                $rowBg  = $isSub ? 'bg-primary-900 text-white font-bold' : 'bg-white hover:bg-slate-50';
-                $numCls = $isSub ? 'text-white' : 'text-slate-700';
-                $txtCls = $isSub ? 'text-white' : 'text-slate-800';
-                $bdr    = 'border border-slate-200';
+                @foreach($records as $row)
+                    @php
+                        $isSub = $row['_is_subtotal'];
+                        $rowClass = $isSub ? 'row-total' : '';
+                        
+                        $fmtBiaya = fn($v) => ($v === null || $v == 0) ? '<span class="dim-zero">0</span>' : number_format($v, 0, ',', '.');
+                        $fmtPaket = fn($v) => ($v === null || $v == 0) ? '<span class="dim-zero">0</span>' : $v;
+                        
+                        $getPillClass = function($v) {
+                            if ($v >= 80) return 'pill-high';
+                            if ($v >= 50) return 'pill-mid';
+                            return 'pill-low';
+                        };
 
-                // Helper: format bilangan besar ke ribuan
-                $fmtBiaya = function($v) {
-                    if ($v === null) return '<span class="text-slate-300">—</span>';
-                    return '<span>'.number_format($v, 0, ',', '.').'</span>';
-                };
-                $fmtPaket = function($v) {
-                    if ($v === null) return '<span class="text-slate-300">—</span>';
-                    return '<span>'.number_format($v, 0, ',', '.').'</span>';
-                };
-                $fmtPct = function($v) use ($isSub) {
-                    if ($v === null) return '<span class="text-slate-300">—</span>';
-                    $color = $v >= 80 ? 'text-emerald-600' : ($v >= 50 ? 'text-amber-600' : 'text-red-500');
-                    $cls = $isSub ? 'text-white font-bold' : $color . ' font-semibold';
-                    return '<span class="'.$cls.'">'.number_format($v, 2, ',', '.').'%</span>';
-                };
-            @endphp
-            <tr class="{{ $rowBg }} transition-colors duration-100">
-                {{-- Unit Kerja --}}
-                <td class="{{ $bdr }} {{ $txtCls }} px-2 py-1.5 sticky left-0 z-10 {{ $isSub ? 'bg-primary-900' : 'bg-white' }} whitespace-nowrap font-{{ $isSub ? 'bold' : 'medium' }}">
-                    {{ $row['unit_kerja'] ?: '—' }}
-                </td>
+                        $fmtPct = function($v) use ($isSub, $getPillClass) {
+                            if ($v === null || $v == 0) return '<span class="dim-zero">0%</span>';
+                            if ($isSub) return number_format($v, 1, ',', '.') . '%';
+                            return '<span class="pct-pill '.$getPillClass($v).'">'.number_format($v, 1, ',', '.').'%</span>';
+                        };
+                    @endphp
+                    <tr class="{{ $rowClass }}">
+                        <td class="sticky-col">{{ $row['unit_kerja'] ?: '—' }}</td>
+                        
+                        {{-- RKAP --}}
+                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_1']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_2']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_3']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_4']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_1']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_2']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_3']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_4']) !!}</td>
 
-                {{-- ── RKAP: Biaya 1–4 | Paket 1–4 ─────────────────────────── --}}
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-amber-50/60 {{ $isSub ? '!bg-amber-800' : '' }}">{!! $fmtBiaya($row['rkap_biaya_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-amber-50/60 {{ $isSub ? '!bg-amber-800' : '' }}">{!! $fmtBiaya($row['rkap_biaya_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-amber-50/60 {{ $isSub ? '!bg-amber-800' : '' }}">{!! $fmtBiaya($row['rkap_biaya_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-amber-50/60 {{ $isSub ? '!bg-amber-800' : '' }}">{!! $fmtBiaya($row['rkap_biaya_4']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-amber-100/60 {{ $isSub ? '!bg-amber-900' : '' }}">{!! $fmtPaket($row['rkap_paket_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-amber-100/60 {{ $isSub ? '!bg-amber-900' : '' }}">{!! $fmtPaket($row['rkap_paket_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-amber-100/60 {{ $isSub ? '!bg-amber-900' : '' }}">{!! $fmtPaket($row['rkap_paket_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-amber-100/60 {{ $isSub ? '!bg-amber-900' : '' }}">{!! $fmtPaket($row['rkap_paket_4']) !!}</td>
+                        {{-- Dokumen --}}
+                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_1']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_2']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_3']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_4']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['doku_paket_1']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['doku_paket_2']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['doku_paket_3']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['doku_paket_4']) !!}</td>
 
-                {{-- ── Dokumen: Biaya 1–4 | Paket 1–4 ───────────────────────── --}}
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-sky-50/60 {{ $isSub ? '!bg-sky-800' : '' }}">{!! $fmtBiaya($row['doku_biaya_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-sky-50/60 {{ $isSub ? '!bg-sky-800' : '' }}">{!! $fmtBiaya($row['doku_biaya_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-sky-50/60 {{ $isSub ? '!bg-sky-800' : '' }}">{!! $fmtBiaya($row['doku_biaya_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-sky-50/60 {{ $isSub ? '!bg-sky-800' : '' }}">{!! $fmtBiaya($row['doku_biaya_4']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-sky-100/60 {{ $isSub ? '!bg-sky-900' : '' }}">{!! $fmtPaket($row['doku_paket_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-sky-100/60 {{ $isSub ? '!bg-sky-900' : '' }}">{!! $fmtPaket($row['doku_paket_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-sky-100/60 {{ $isSub ? '!bg-sky-900' : '' }}">{!! $fmtPaket($row['doku_paket_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-sky-100/60 {{ $isSub ? '!bg-sky-900' : '' }}">{!! $fmtPaket($row['doku_paket_4']) !!}</td>
+                        {{-- Tekpol --}}
+                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_1']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_2']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_3']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_4']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_1']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_2']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_3']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_4']) !!}</td>
 
-                {{-- ── Tekpol: Biaya 1–4 | Paket 1–4 ────────────────────────── --}}
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-teal-50/60 {{ $isSub ? '!bg-teal-800' : '' }}">{!! $fmtBiaya($row['tekpol_biaya_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-teal-50/60 {{ $isSub ? '!bg-teal-800' : '' }}">{!! $fmtBiaya($row['tekpol_biaya_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-teal-50/60 {{ $isSub ? '!bg-teal-800' : '' }}">{!! $fmtBiaya($row['tekpol_biaya_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-teal-50/60 {{ $isSub ? '!bg-teal-800' : '' }}">{!! $fmtBiaya($row['tekpol_biaya_4']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-teal-100/60 {{ $isSub ? '!bg-teal-900' : '' }}">{!! $fmtPaket($row['tekpol_paket_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-teal-100/60 {{ $isSub ? '!bg-teal-900' : '' }}">{!! $fmtPaket($row['tekpol_paket_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-teal-100/60 {{ $isSub ? '!bg-teal-900' : '' }}">{!! $fmtPaket($row['tekpol_paket_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-teal-100/60 {{ $isSub ? '!bg-teal-900' : '' }}">{!! $fmtPaket($row['tekpol_paket_4']) !!}</td>
+                        {{-- HPS --}}
+                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_1']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_2']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_3']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_4']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['hps_paket_1']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['hps_paket_2']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['hps_paket_3']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['hps_paket_4']) !!}</td>
 
-                {{-- ── HPS: Biaya 1–4 | Paket 1–4 ───────────────────────────── --}}
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-violet-50/60 {{ $isSub ? '!bg-violet-800' : '' }}">{!! $fmtBiaya($row['hps_biaya_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-violet-50/60 {{ $isSub ? '!bg-violet-800' : '' }}">{!! $fmtBiaya($row['hps_biaya_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-violet-50/60 {{ $isSub ? '!bg-violet-800' : '' }}">{!! $fmtBiaya($row['hps_biaya_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-violet-50/60 {{ $isSub ? '!bg-violet-800' : '' }}">{!! $fmtBiaya($row['hps_biaya_4']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-violet-100/60 {{ $isSub ? '!bg-violet-900' : '' }}">{!! $fmtPaket($row['hps_paket_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-violet-100/60 {{ $isSub ? '!bg-violet-900' : '' }}">{!! $fmtPaket($row['hps_paket_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-violet-100/60 {{ $isSub ? '!bg-violet-900' : '' }}">{!! $fmtPaket($row['hps_paket_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-violet-100/60 {{ $isSub ? '!bg-violet-900' : '' }}">{!! $fmtPaket($row['hps_paket_4']) !!}</td>
+                        {{-- SPPBJ --}}
+                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_1']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_2']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_3']) !!}</td>
+                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_4']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_1']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_2']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_3']) !!}</td>
+                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_4']) !!}</td>
 
-                {{-- ── SPPBJ: Biaya 1–4 | Paket 1–4 ──────────────────────────── --}}
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-rose-50/60 {{ $isSub ? '!bg-rose-800' : '' }}">{!! $fmtBiaya($row['sppbj_biaya_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-rose-50/60 {{ $isSub ? '!bg-rose-800' : '' }}">{!! $fmtBiaya($row['sppbj_biaya_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-rose-50/60 {{ $isSub ? '!bg-rose-800' : '' }}">{!! $fmtBiaya($row['sppbj_biaya_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-right bg-rose-50/60 {{ $isSub ? '!bg-rose-800' : '' }}">{!! $fmtBiaya($row['sppbj_biaya_4']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-rose-100/60 {{ $isSub ? '!bg-rose-900' : '' }}">{!! $fmtPaket($row['sppbj_paket_1']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-rose-100/60 {{ $isSub ? '!bg-rose-900' : '' }}">{!! $fmtPaket($row['sppbj_paket_2']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-rose-100/60 {{ $isSub ? '!bg-rose-900' : '' }}">{!! $fmtPaket($row['sppbj_paket_3']) !!}</td>
-                <td class="{{ $bdr }} {{ $numCls }} px-1.5 py-1 text-center bg-rose-100/60 {{ $isSub ? '!bg-rose-900' : '' }}">{!! $fmtPaket($row['sppbj_paket_4']) !!}</td>
-
-                {{-- ── % Progress Columns ────────────────────────────────── --}}
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-50 {{ $isSub ? '!bg-slate-700' : '' }}">{!! $fmtPct($row['pct_diaj_biaya']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-50 {{ $isSub ? '!bg-slate-700' : '' }}">{!! $fmtPct($row['pct_diaj_paket']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-100/80 {{ $isSub ? '!bg-slate-600' : '' }}">{!! $fmtPct($row['pct_belum_biaya']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-100/80 {{ $isSub ? '!bg-slate-600' : '' }}">{!! $fmtPct($row['pct_belum_paket']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-50 {{ $isSub ? '!bg-slate-700' : '' }}">{!! $fmtPct($row['pct_hps_biaya']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-50 {{ $isSub ? '!bg-slate-700' : '' }}">{!! $fmtPct($row['pct_hps_paket']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-100/80 {{ $isSub ? '!bg-slate-600' : '' }}">{!! $fmtPct($row['pct_sppbj_biaya']) !!}</td>
-                <td class="pct-col {{ $bdr }} px-1.5 py-1 text-center bg-slate-100/80 {{ $isSub ? '!bg-slate-600' : '' }}">{!! $fmtPct($row['pct_sppbj_paket']) !!}</td>
-            </tr>
-            @endforeach
+                        {{-- Progress --}}
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_diaj_biaya']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_diaj_paket']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_belum_biaya']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_belum_paket']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_hps_biaya']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_hps_paket']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_sppbj_biaya']) !!}</td>
+                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_sppbj_paket']) !!}</td>
+                    </tr>
+                @endforeach
             </tbody>
         </table>
     </div>
 </div>
 
-@endif
-
-@endsection
-
-@push('styles')
-<style>
-    /* ── Fullscreen specific overrides ── */
-    #sidebar, header, footer { display: none !important; }
-    #main-content { margin-left: 0 !important; height: 100vh !important; display: flex !important; flex-direction: column !important; }
-    main { padding: 12px 16px !important; flex: 1; display: flex; flex-direction: column; min-height: 0;}
-    body { background-color: #f8fafc; }
-
-    /* Make sticky header work correctly */
-    #prioritas-table thead th { position: sticky; }
-    #prioritas-table thead tr:nth-child(1) th { top: 0; }
-    #prioritas-table thead tr:nth-child(2) th { top: 28px; }
-    #prioritas-table thead tr:nth-child(3) th { top: 52px; }
-
-    /* Override for the rowspan unit-kerja header */
-    #prioritas-table thead tr:nth-child(1) th:first-child {
-        top: 0;
-        height: 84px; /* 3 rows height */
-    }
-
-    /* Frozen first column */
-    #prioritas-table tbody td:first-child {
-        position: sticky;
-        left: 0;
-        z-index: 10;
-        box-shadow: 2px 0 4px rgba(0,0,0,0.05); /* add small shadow to show depth */
-    }
-    #prioritas-table thead th:first-child {
-        box-shadow: 2px 0 4px rgba(0,0,0,0.05);
-    }
-
-    /* Subtotal row styles */
-    .subtotal-row td { font-weight: 700; }
-
-    /* Hover feedback */
-    #prioritas-table tbody tr:not(.subtotal-row):hover td {
-        background-color: rgba(219, 234, 254, 0.4) !important;
-    }
-
-    /* Custom scrollbar for table */
-    #prioritas-table::-webkit-scrollbar { width: 8px; height: 8px; }
-    #prioritas-table::-webkit-scrollbar-track { background: #f1f5f9; }
-    #prioritas-table::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 9999px; }
-    #prioritas-table::-webkit-scrollbar-thumb:hover { background: #64748b; }
-
-    /* PCT col hidden */
-    .pct-hidden .pct-col { display: none !important; }
-</style>
-@endpush
-
 @push('scripts')
 <script>
-let pctVisible = true;
-
-function togglePctCols() {
-    pctVisible = !pctVisible;
-    const table = document.getElementById('prioritas-table');
-    if (pctVisible) {
-        table.classList.remove('pct-hidden');
-        document.getElementById('btn-toggle-pct-label').textContent = 'Sembunyikan %';
-    } else {
-        table.classList.add('pct-hidden');
-        document.getElementById('btn-toggle-pct-label').textContent = 'Tampilkan %';
+    function togglePctCols() {
+        const cols = document.querySelectorAll('.pct-col');
+        const isHidden = cols[0].style.display === 'none';
+        cols.forEach(c => c.style.display = isHidden ? '' : 'none');
     }
-}
 </script>
 @endpush
+
+@endsection
