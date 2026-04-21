@@ -9,34 +9,35 @@
 @endphp
 
 @push('styles')
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
     :root {
-        --slate-950: #0f172a;
-        --slate-900: #1e293b;
-        --slate-800: #334155;
-        --blue-500: #3b82f6;
-        --emerald-500: #10b981;
-        --amber-500: #f59e0b;
-        --rose-500: #f43f5e;
-        --indigo-500: #6366f1;
-        --text-100: #f1f5f9;
-        --text-400: #94a3b8;
-        --border-subtle: rgba(255, 255, 255, 0.05);
+        --bg-main: #f8fafc;
+        --bg-card: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border-color: #e2e8f0;
+        
+        /* Stage Colors - Professional Light Palette */
+        --rkap-bg: #fff7ed; --rkap-text: #9a3412; --rkap-border: #f97316;
+        --doku-bg: #eff6ff; --doku-text: #1e40af; --doku-border: #3b82f6;
+        --tekpol-bg: #ecfdf5; --tekpol-text: #065f46; --tekpol-border: #10b981;
+        --hps-bg: #f5f3ff; --hps-text: #5b21b6; --hps-border: #8b5cf6;
+        --sppbj-bg: #fff1f2; --sppbj-text: #9f1239; --sppbj-border: #f43f5e;
     }
 
     body {
-        background-color: var(--slate-950) !important;
-        color: var(--text-100) !important;
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: var(--bg-main) !important;
+        color: var(--text-main) !important;
+        font-family: 'Inter', sans-serif;
         overflow-x: hidden !important;
     }
 
-    /* Fullscreen Mode - Hide App UI */
+    /* Hide Sidebar/Header for Max Space */
     #sidebar, header, footer { display: none !important; }
 
     #main-content {
-        background-color: var(--slate-950) !important;
+        background-color: var(--bg-main) !important;
         margin-left: 0 !important;
         width: 100vw !important;
         height: 100vh !important;
@@ -46,114 +47,78 @@
     }
 
     main {
-        padding: 1.5rem !important;
+        padding: 1rem !important;
         flex: 1 !important;
         display: flex !important;
         flex-direction: column !important;
         min-height: 0 !important;
     }
 
-    /* Page Header */
-    .dashboard-header {
+    /* Header Styling */
+    .dashboard-nav {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 1.5rem;
+        margin-bottom: 0.75rem;
+        background: #fff;
+        padding: 0.75rem 1.25rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
     }
 
-    .brand-box {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
-    }
-
-    .brand-icon {
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, var(--blue-500), var(--indigo-500));
-        border-radius: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
-    }
-
-    .brand-text h1 {
-        font-size: 1.5rem;
-        font-weight: 800;
-        letter-spacing: -0.025em;
-        margin: 0;
-        background: linear-gradient(to right, #fff, #94a3b8);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .brand-text p {
-        font-size: 0.8rem;
-        color: var(--text-400);
-        margin: 0;
-    }
-
-    /* Action Buttons */
-    .btn-action {
-        background: var(--slate-900);
-        border: 1px solid var(--slate-800);
-        color: #fff;
-        padding: 0.6rem 1.2rem;
-        border-radius: 10px;
-        font-size: 0.75rem;
+    .nav-brand { display: flex; align-items: center; gap: 0.75rem; }
+    .nav-brand h1 { font-size: 1.1rem; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -0.02em; }
+    .nav-brand p { font-size: 0.7rem; color: var(--text-muted); margin: 0; }
+    
+    .btn-pill {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.7rem;
         font-weight: 700;
         text-transform: uppercase;
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.4rem;
         transition: all 0.2s;
+        border: 1px solid var(--border-color);
+        background: #fff;
+        color: var(--text-main);
     }
 
-    .btn-action:hover {
-        background: var(--slate-800);
-        transform: translateY(-1px);
-    }
+    .btn-pill:hover { background: #f1f5f9; border-color: #cbd5e1; }
+    .btn-blue { background: #2563eb; color: #fff; border: none; }
+    .btn-blue:hover { background: #1d4ed8; }
 
-    .btn-primary-blue {
-        background: var(--blue-500);
-        border: none;
-        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-    }
-
-    .btn-primary-blue:hover {
-        background: #2563eb;
-        box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-    }
-
-    /* Main Table Container */
-    .data-card {
-        background: var(--slate-900);
-        border-radius: 20px;
-        border: 1px solid var(--slate-800);
+    /* Table Grid Container */
+    .grid-card {
+        background: #fff;
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
         display: flex;
         flex-direction: column;
         flex: 1;
         min-height: 0;
         overflow: hidden;
-        box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
 
-    .table-header-toolbar {
-        padding: 1.25rem 1.5rem;
+    .grid-toolbar {
+        padding: 0.75rem 1.25rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        border-bottom: 1px solid var(--border-subtle);
+        background: #fafafa;
+        border-bottom: 1px solid var(--border-color);
     }
 
-    .table-scroller {
+    .grid-scroller {
         flex: 1;
         overflow: auto;
         position: relative;
     }
 
-    /* Table Professional Styling */
+    /* Professional Table Styling */
     #prioritas-table {
         border-collapse: separate;
         border-spacing: 0;
@@ -161,249 +126,237 @@
         font-size: 11px;
     }
 
-    /* Header Grouping & Coloring */
-    #prioritas-table thead th {
-        background: var(--slate-900);
-        color: var(--text-400);
+    #prioritas-table th {
+        background: #f8fafc;
+        color: #475569;
         font-weight: 700;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        padding: 12px 10px;
-        border-right: 1px solid var(--border-subtle);
-        border-bottom: 1px solid var(--border-subtle);
+        letter-spacing: 0.025em;
+        padding: 10px 8px;
+        border-right: 1px solid var(--border-color);
+        border-bottom: 1px solid var(--border-color);
         position: sticky;
         top: 0;
         z-index: 30;
     }
 
-    /* Colored accents for each stage section */
-    .stage-rkap { border-top: 3px solid var(--amber-500) !important; color: var(--amber-500) !important; }
-    .stage-doku { border-top: 3px solid var(--blue-500) !important; color: var(--blue-500) !important; }
-    .stage-tekpol { border-top: 3px solid var(--emerald-500) !important; color: var(--emerald-500) !important; }
-    .stage-hps { border-top: 3px solid var(--indigo-500) !important; color: var(--indigo-500) !important; }
-    .stage-sppbj { border-top: 3px solid var(--rose-500) !important; color: var(--rose-500) !important; }
-    .stage-pct { border-top: 3px solid var(--text-400) !important; color: var(--text-100) !important; }
+    /* Stage Headers Highlighting */
+    .h-rkap { border-top: 4px solid var(--rkap-border) !important; background: var(--rkap-bg) !important; color: var(--rkap-text) !important; }
+    .h-doku { border-top: 4px solid var(--doku-border) !important; background: var(--doku-bg) !important; color: var(--doku-text) !important; }
+    .h-tekpol { border-top: 4px solid var(--tekpol-border) !important; background: var(--tekpol-bg) !important; color: var(--tekpol-text) !important; }
+    .h-hps { border-top: 4px solid var(--hps-border) !important; background: var(--hps-bg) !important; color: var(--hps-text) !important; }
+    .h-sppbj { border-top: 4px solid var(--sppbj-border) !important; background: var(--sppbj-bg) !important; color: var(--sppbj-text) !important; }
+    .h-pct { border-top: 4px solid #94a3b8 !important; background: #f1f5f9 !important; }
 
-    #prioritas-table thead tr:nth-child(2) th { top: 43px; }
-    #prioritas-table thead tr:nth-child(3) th { top: 78px; font-size: 9px; color: var(--text-400); }
+    #prioritas-table thead tr:nth-child(2) th { top: 38px; }
+    #prioritas-table thead tr:nth-child(3) th { top: 70px; font-size: 9px; }
 
-    /* Sticky Column */
+    /* Sticky Column Unit Kerja */
     #prioritas-table .sticky-col {
         position: sticky;
         left: 0;
         z-index: 40;
-        background: var(--slate-900);
+        background: #fff;
         min-width: 220px;
         max-width: 220px;
-        border-right: 2px solid var(--slate-800);
+        border-right: 2px solid #cbd5e1;
         text-align: left;
-        padding-left: 1.5rem;
+        padding-left: 1.25rem;
+        box-shadow: 2px 0 5px rgba(0,0,0,0.02);
     }
 
-    #prioritas-table thead .sticky-col { z-index: 50; }
+    #prioritas-table thead .sticky-col { z-index: 50; background: #f8fafc; }
 
-    /* Table Body */
-    #prioritas-table td {
-        padding: 10px;
-        border-right: 1px solid var(--border-subtle);
-        border-bottom: 1px solid var(--border-subtle);
-        white-space: nowrap;
-        color: var(--text-100);
-    }
+    /* Zebra Striping for Readability */
+    #prioritas-table tbody tr:nth-child(even) td { background-color: #fdfdfd; }
+    #prioritas-table tbody tr:nth-child(odd) td { background-color: #fff; }
+    #prioritas-table tbody tr:hover td { background-color: #f1f5f9 !important; }
 
-    #prioritas-table tbody tr:hover td {
-        background-color: rgba(255, 255, 255, 0.02) !important;
-    }
+    /* Subtotal / Regional Styling */
+    .row-highlight { background-color: #f1f5f9 !important; font-weight: 800; }
+    .row-highlight td { color: #1e40af !important; border-bottom: 2px solid #cbd5e1 !important; }
+    .row-highlight .sticky-col { background-color: #f1f5f9 !important; }
 
-    /* Subtotal / Regional Rows */
-    .row-total {
-        background-color: rgba(59, 130, 246, 0.1) !important;
-        font-weight: 800;
-    }
-    .row-total td { color: var(--blue-500) !important; }
-    .row-total .sticky-col { background-color: #1e293b !important; }
-
-    /* Data Formatting */
-    .num-font { font-family: 'JetBrains Mono', monospace; text-align: right; }
-    .dim-zero { color: #334155; }
+    /* Cell Data Styling */
+    .val-num { font-family: 'JetBrains Mono', monospace; text-align: right; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .val-dim { color: #cbd5e1; }
     
-    /* Progress Pills */
-    .pct-pill {
+    /* Progress Badges */
+    .badge-pct {
         display: inline-block;
-        padding: 4px 10px;
-        border-radius: 6px;
+        padding: 2px 8px;
+        border-radius: 4px;
         font-weight: 700;
         font-size: 10px;
-        min-width: 55px;
+        min-width: 50px;
         text-align: center;
+        border: 1px solid transparent;
     }
-    .pill-high { background: rgba(16, 185, 129, 0.1); color: var(--emerald-500); border: 1px solid rgba(16, 185, 129, 0.2); }
-    .pill-mid { background: rgba(245, 158, 11, 0.1); color: var(--amber-500); border: 1px solid rgba(245, 158, 11, 0.2); }
-    .pill-low { background: rgba(244, 63, 94, 0.1); color: var(--rose-500); border: 1px solid rgba(244, 63, 94, 0.2); }
+    .badge-green { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+    .badge-amber { background: #fef3c7; color: #92400e; border-color: #fde68a; }
+    .badge-red { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
 
-    /* Column Sizing */
-    .w-biaya { min-width: 100px; width: 100px; }
-    .w-paket { min-width: 45px; width: 45px; }
-    .w-pct { min-width: 80px; width: 80px; text-align: center; }
+    /* Width definitions to prevent overlap */
+    .w-biaya { min-width: 110px; width: 110px; }
+    .w-paket { min-width: 60px; width: 60px; text-align: center !important; }
+    .w-pct { min-width: 80px; width: 80px; text-align: center !important; }
 
-    /* Scrollbar */
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: var(--slate-950); }
-    ::-webkit-scrollbar-thumb { background: var(--slate-800); border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--slate-700); }
+    /* Tab Switcher Styling */
+    .tab-switcher {
+        display: flex;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+    }
+    .tab-btn {
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .tab-btn.active {
+        background: #fff;
+        color: #2563eb;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    [data-tab-content] { display: none; }
+    [data-tab-content].active { display: table-cell; }
+    .tab-hidden { display: none !important; }
+
+    /* New Tab Logic */
+    #prioritas-table.tab-biaya .tab-content-paket { display: none !important; }
+    #prioritas-table.tab-paket .tab-content-biaya { display: none !important; }
 </style>
 @endpush
 
-<div class="dashboard-header">
-    <div class="brand-box">
-        <div class="brand-icon">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+<div class="dashboard-nav">
+    <div class="nav-brand">
+        <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-blue-600 text-white shadow-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
         </div>
-        <div class="brand-text">
-            <h1>INVESTASI</h1>
-            <p>Monitoring harian progres realisasi investasi unit kerja.</p>
+        <div>
+            <h1>MONITORING INVESTASI</h1>
+            <p>Progres harian realisasi nilai & paket investasi unit kerja.</p>
         </div>
     </div>
-    <div class="flex items-center gap-3">
-        <a href="{{ route('dashboard') }}" class="btn-action">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            Kembali
+    <div class="flex items-center gap-2">
+        <a href="{{ route('dashboard') }}" class="btn-pill">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            Dashboard
         </a>
-        <a href="{{ route('prioritas.index', ['refresh' => 1]) }}" class="btn-action btn-primary-blue">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <a href="{{ route('prioritas.index', ['refresh' => 1]) }}" class="btn-pill btn-blue">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
             Refresh Data
         </a>
     </div>
 </div>
 
-<div class="data-card">
-    <div class="table-header-toolbar">
-        <div class="flex items-center gap-3">
-            <div class="w-2 h-2 rounded-full bg-blue-500 animate-pulse"></div>
-            <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Detail Monitoring Unit Kerja</span>
+<div class="grid-card">
+    <div class="grid-toolbar">
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span class="text-[10px] font-extrabold text-slate-500 uppercase tracking-widest">Data Real-Time</span>
+            </div>
+            
+            <div class="tab-switcher">
+                <div class="tab-btn active" onclick="switchTab('biaya')">Monitoring Biaya</div>
+                <div class="tab-btn" onclick="switchTab('paket')">Monitoring Paket</div>
+            </div>
         </div>
-        <button onclick="togglePctCols()" class="btn-action">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            Toggle Persentase
+        <button onclick="togglePctCols()" class="btn-pill">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            Toggle %
         </button>
     </div>
 
-    <div class="table-scroller">
-        <table id="prioritas-table">
+    <div class="grid-scroller">
+        <table id="prioritas-table" class="tab-biaya">
             <thead>
                 <tr>
                     <th rowspan="3" class="sticky-col">Unit Kerja</th>
-                    <th colspan="8" class="stage-rkap">RKAP 2026 Setahun</th>
-                    <th colspan="8" class="stage-doku">Dokumen di Unit</th>
-                    <th colspan="8" class="stage-tekpol">Sudah Diajukan (Tekpol)</th>
-                    <th colspan="8" class="stage-hps">HPS / Pengadaan</th>
-                    <th colspan="8" class="stage-sppbj">SPPBJ / Kontrak</th>
-                    <th colspan="8" class="stage-pct pct-col">Progress Thd RKAP (%)</th>
+                    <th colspan="4" class="h-rkap stage-header">RKAP 2026 Setahun</th>
+                    <th colspan="4" class="h-doku stage-header">Dokumen di Unit</th>
+                    <th colspan="4" class="h-tekpol stage-header">Sudah Diajukan</th>
+                    <th colspan="4" class="h-hps stage-header">HPS / Pengadaan</th>
+                    <th colspan="4" class="h-sppbj stage-header">SPPBJ / Kontrak</th>
+                    <th colspan="4" class="h-pct pct-col stage-header">Progress (%)</th>
                 </tr>
                 <tr>
                     @for($i=0; $i<5; $i++)
-                        <th colspan="4">Σ Biaya (Rp)</th>
-                        <th colspan="4">Σ Paket</th>
+                        <th colspan="4" class="tab-content-biaya">Σ Biaya (Rp)</th>
+                        <th colspan="4" class="tab-content-paket">Σ Paket</th>
                     @endfor
-                    <th colspan="2" class="pct-col">Diajukan</th>
-                    <th colspan="2" class="pct-col">Belum</th>
-                    <th colspan="2" class="pct-col">HPS</th>
-                    <th colspan="2" class="pct-col">SPPBJ</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">Diajukan</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-paket">Diajukan</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">Belum</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-paket">Belum</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">HPS</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-paket">HPS</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">SPPBJ</th>
+                    <th colspan="1" rowspan="2" class="pct-col tab-content-paket">SPPBJ</th>
                 </tr>
                 <tr>
                     @for($g=0; $g<5; $g++)
-                        <th class="w-biaya">1</th><th class="w-biaya">2</th><th class="w-biaya">3</th><th class="w-biaya">4</th>
-                        <th class="w-paket">1</th><th class="w-paket">2</th><th class="w-paket">3</th><th class="w-paket">4</th>
+                        <th class="w-biaya tab-content-biaya">1</th><th class="w-biaya tab-content-biaya">2</th><th class="w-biaya tab-content-biaya">3</th><th class="w-biaya tab-content-biaya">4</th>
+                        <th class="w-paket tab-content-paket">1</th><th class="w-paket tab-content-paket">2</th><th class="w-paket tab-content-paket">3</th><th class="w-paket tab-content-paket">4</th>
                     @endfor
-                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
-                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
-                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
-                    <th class="w-pct pct-col">Biaya</th><th class="w-pct pct-col">Paket</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach($records as $row)
                     @php
                         $isSub = $row['_is_subtotal'];
-                        $rowClass = $isSub ? 'row-total' : '';
+                        $rowClass = $isSub ? 'row-highlight' : '';
                         
-                        $fmtBiaya = fn($v) => ($v === null || $v == 0) ? '<span class="dim-zero">0</span>' : number_format($v, 0, ',', '.');
-                        $fmtPaket = fn($v) => ($v === null || $v == 0) ? '<span class="dim-zero">0</span>' : $v;
+                        $fmtBiaya = fn($v) => ($v === null || $v == 0) ? '<span class="val-dim">0</span>' : number_format($v, 0, ',', '.');
+                        $fmtPaket = fn($v) => ($v === null || $v == 0) ? '<span class="val-dim">0</span>' : $v;
                         
-                        $getPillClass = function($v) {
-                            if ($v >= 80) return 'pill-high';
-                            if ($v >= 50) return 'pill-mid';
-                            return 'pill-low';
-                        };
-
-                        $fmtPct = function($v) use ($isSub, $getPillClass) {
-                            if ($v === null || $v == 0) return '<span class="dim-zero">0%</span>';
+                        $getBadge = function($v) use ($isSub) {
+                            if ($v === null || $v == 0) return '<span class="val-dim">0%</span>';
                             if ($isSub) return number_format($v, 1, ',', '.') . '%';
-                            return '<span class="pct-pill '.$getPillClass($v).'">'.number_format($v, 1, ',', '.').'%</span>';
+                            $cls = ($v >= 80) ? 'badge-green' : (($v >= 50) ? 'badge-amber' : 'badge-red');
+                            return '<span class="badge-pct '.$cls.'">'.number_format($v, 1, ',', '.').'%</span>';
                         };
                     @endphp
                     <tr class="{{ $rowClass }}">
                         <td class="sticky-col">{{ $row['unit_kerja'] ?: '—' }}</td>
                         
-                        {{-- RKAP --}}
-                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_1']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_2']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_3']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['rkap_biaya_4']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_1']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_2']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_3']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['rkap_paket_4']) !!}</td>
+                        @php
+                            $stages = [
+                                ['rkap_biaya_1','rkap_biaya_2','rkap_biaya_3','rkap_biaya_4','rkap_paket_1','rkap_paket_2','rkap_paket_3','rkap_paket_4'],
+                                ['doku_biaya_1','doku_biaya_2','doku_biaya_3','doku_biaya_4','doku_paket_1','doku_paket_2','doku_paket_3','doku_paket_4'],
+                                ['tekpol_biaya_1','tekpol_biaya_2','tekpol_biaya_3','tekpol_biaya_4','tekpol_paket_1','tekpol_paket_2','tekpol_paket_3','tekpol_paket_4'],
+                                ['hps_biaya_1','hps_biaya_2','hps_biaya_3','hps_biaya_4','hps_paket_1','hps_paket_2','hps_paket_3','hps_paket_4'],
+                                ['sppbj_biaya_1','sppbj_biaya_2','sppbj_biaya_3','sppbj_biaya_4','sppbj_paket_1','sppbj_paket_2','sppbj_paket_3','sppbj_paket_4'],
+                            ];
+                        @endphp
 
-                        {{-- Dokumen --}}
-                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_1']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_2']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_3']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['doku_biaya_4']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['doku_paket_1']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['doku_paket_2']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['doku_paket_3']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['doku_paket_4']) !!}</td>
+                        @foreach($stages as $stageCols)
+                            @for($i=0; $i<4; $i++)
+                                <td class="val-num tab-content-biaya">{!! $fmtBiaya($row[$stageCols[$i]]) !!}</td>
+                            @endfor
+                            @for($i=4; $i<8; $i++)
+                                <td class="val-num w-paket tab-content-paket">{!! $fmtPaket($row[$stageCols[$i]]) !!}</td>
+                            @endfor
+                        @endforeach
 
-                        {{-- Tekpol --}}
-                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_1']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_2']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_3']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['tekpol_biaya_4']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_1']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_2']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_3']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['tekpol_paket_4']) !!}</td>
-
-                        {{-- HPS --}}
-                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_1']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_2']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_3']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['hps_biaya_4']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['hps_paket_1']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['hps_paket_2']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['hps_paket_3']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['hps_paket_4']) !!}</td>
-
-                        {{-- SPPBJ --}}
-                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_1']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_2']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_3']) !!}</td>
-                        <td class="num-font">{!! $fmtBiaya($row['sppbj_biaya_4']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_1']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_2']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_3']) !!}</td>
-                        <td class="num-font">{!! $fmtPaket($row['sppbj_paket_4']) !!}</td>
-
-                        {{-- Progress --}}
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_diaj_biaya']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_diaj_paket']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_belum_biaya']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_belum_paket']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_hps_biaya']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_hps_paket']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_sppbj_biaya']) !!}</td>
-                        <td class="w-pct pct-col">{!! $fmtPct($row['pct_sppbj_paket']) !!}</td>
+                        {{-- Progress Columns --}}
+                        <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_diaj_biaya']) !!}</td>
+                        <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_diaj_paket']) !!}</td>
+                        <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_belum_biaya']) !!}</td>
+                        <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_belum_paket']) !!}</td>
+                        <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_hps_biaya']) !!}</td>
+                        <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_hps_paket']) !!}</td>
+                        <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_sppbj_biaya']) !!}</td>
+                        <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_sppbj_paket']) !!}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -413,11 +366,37 @@
 
 @push('scripts')
 <script>
+    function switchTab(tab) {
+        // Update buttons
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            const btnText = btn.innerText.toLowerCase();
+            if(btnText.includes(tab)) btn.classList.add('active');
+        });
+
+        // Update table class
+        const table = document.getElementById('prioritas-table');
+        table.classList.remove('tab-biaya', 'tab-paket');
+        table.classList.add('tab-' + tab);
+
+        // Update stage headers colspan
+        // When in single tab mode, each stage has 4 columns instead of 8
+        const headers = document.querySelectorAll('.stage-header');
+        headers.forEach(h => {
+            h.setAttribute('colspan', '4');
+        });
+    }
+
     function togglePctCols() {
         const cols = document.querySelectorAll('.pct-col');
-        const isHidden = cols[0].style.display === 'none';
-        cols.forEach(c => c.style.display = isHidden ? '' : 'none');
+        cols.forEach(c => c.classList.toggle('tab-hidden'));
     }
+
+    // Initialize state
+    document.addEventListener('DOMContentLoaded', () => {
+        // Ensure initial colspan is correct
+        switchTab('biaya');
+    });
 </script>
 @endpush
 
