@@ -60,132 +60,187 @@ class PrioritasSheetService
     /**
      * Ambil data lengkap yang sudah di-parse ke format tabel dashboard.
      * Baris 1-4 = header/judul, Baris 5-6 = kolom header, Baris 7+ = data.
-     * Cache 5 menit untuk performa.
+     * Default tanpa cache agar perubahan sheet langsung terlihat.
+     * Bisa aktifkan cache via env PRIORITAS_CACHE_SECONDS (> 0).
      */
     public function getDashboardData(): array
     {
-        return Cache::remember('prioritas_dashboard_data', 300, function () {
-            $rows = $this->getRawRows("'{$this->sheetName}'!A1:BH500");
+        $cacheSeconds = (int) env('PRIORITAS_CACHE_SECONDS', 0);
 
-            if (empty($rows)) {
-                return [
-                    'title'   => '',
-                    'date'    => '',
-                    'headers' => [],
-                    'groups'  => [],
-                    'records' => [],
-                ];
-            }
+        if ($cacheSeconds > 0) {
+            return Cache::remember('prioritas_dashboard_data', $cacheSeconds, function () {
+                return $this->buildDashboardData();
+            });
+        }
 
-            // Baris 1 = judul utama (A1)
-            $title = $rows[0][0] ?? '';
+        return $this->buildDashboardData();
+    }
 
-            // Baris 2 = tanggal (A2)
-            $date = $rows[1][0] ?? '';
+    protected function buildDashboardData(): array
+    {
+        $rows = $this->getRawRows("'{$this->sheetName}'!A1:BH500");
 
-            // Baris 4-6 = header grup & sub-header
-            // Berdasarkan screenshot, struktur:
-            // Row 4 (index 3): Unit Kerja | RKAP 2026 Rekg 045 Setahun (Prioritas) | Dokumen di Unit | Sudah diajukan Unit (Bag Tekpol) | HPS/Pengadaan | SPPBJ/Kontrak | %Progress Thd RKAP setahun (%)
-            // Row 5 (index 4): sub-header tiap grup
-            // Row 6 (index 5): sub-sub-header (1,2,3,4 dll)
-            // Row 7+ (index 6+): data
-
-            // Parse data records (dari baris ke-7, index 6)
-            $records = [];
-            for ($i = 6; $i < count($rows); $i++) {
-                $row = $rows[$i];
-                if (empty($row) || (empty($row[0]) && empty($row[1]))) {
-                    continue; // skip baris kosong
-                }
-
-                // ── Struktur kolom AKTUAL (8 kolom/grup, TIDAK ada kolom Σ Total):
-                // A=0: Unit Kerja
-                // RKAP    : B(1) C(2) D(3) E(4)=Biaya1-4 | F(5) G(6) H(7) I(8)=Paket1-4
-                // Dokumen : J(9) K(10)L(11)M(12)=Biaya1-4 | N(13)O(14)P(15)Q(16)=Paket1-4
-                // Tekpol  : R(17)S(18)T(19)U(20)=Biaya1-4 | V(21)W(22)X(23)Y(24)=Paket1-4
-                // HPS     : Z(25)AA(26)AB(27)AC(28)=Biaya1-4| AD(29)AE(30)AF(31)AG(32)=Paket1-4
-                // SPPBJ   : AH(33)AI(34)AJ(35)AK(36)=Biaya1-4| AL(37)AM(38)AN(39)AO(40)=Paket1-4
-                // % Prog  : AP(41)=DiajBiaya AQ(42)=DiajPaket AR(43)=BelumBiaya AS(44)=BelumPaket
-                //           AT(45)=HPSBiaya  AU(46)=HPSPaket  AV(47)=SPPBJBiaya AW(48)=SPPBJPaket
-
-                $records[] = [
-                    'unit_kerja'         => $row[0] ?? '',
-
-                    // RKAP 2026 - Σ Biaya (Rp) cols 1-4
-                    'rkap_biaya_1'       => $this->parseNum($row[1] ?? ''),
-                    'rkap_biaya_2'       => $this->parseNum($row[2] ?? ''),
-                    'rkap_biaya_3'       => $this->parseNum($row[3] ?? ''),
-                    'rkap_biaya_4'       => $this->parseNum($row[4] ?? ''),
-                    // RKAP - Σ Paket breakdown 1-4
-                    'rkap_paket_1'       => $this->parseInt($row[5] ?? ''),
-                    'rkap_paket_2'       => $this->parseInt($row[6] ?? ''),
-                    'rkap_paket_3'       => $this->parseInt($row[7] ?? ''),
-                    'rkap_paket_4'       => $this->parseInt($row[8] ?? ''),
-
-                    // Dokumen di Unit - Σ Biaya (Rp) cols 1-4
-                    'doku_biaya_1'       => $this->parseNum($row[9] ?? ''),
-                    'doku_biaya_2'       => $this->parseNum($row[10] ?? ''),
-                    'doku_biaya_3'       => $this->parseNum($row[11] ?? ''),
-                    'doku_biaya_4'       => $this->parseNum($row[12] ?? ''),
-                    // Dokumen - Σ Paket breakdown 1-4
-                    'doku_paket_1'       => $this->parseInt($row[13] ?? ''),
-                    'doku_paket_2'       => $this->parseInt($row[14] ?? ''),
-                    'doku_paket_3'       => $this->parseInt($row[15] ?? ''),
-                    'doku_paket_4'       => $this->parseInt($row[16] ?? ''),
-
-                    // Sudah Diajukan Unit (Bag Tekpol) - Σ Biaya (Rp) 1-4
-                    'tekpol_biaya_1'     => $this->parseNum($row[17] ?? ''),
-                    'tekpol_biaya_2'     => $this->parseNum($row[18] ?? ''),
-                    'tekpol_biaya_3'     => $this->parseNum($row[19] ?? ''),
-                    'tekpol_biaya_4'     => $this->parseNum($row[20] ?? ''),
-                    // Tekpol - Σ Paket breakdown 1-4
-                    'tekpol_paket_1'     => $this->parseInt($row[21] ?? ''),
-                    'tekpol_paket_2'     => $this->parseInt($row[22] ?? ''),
-                    'tekpol_paket_3'     => $this->parseInt($row[23] ?? ''),
-                    'tekpol_paket_4'     => $this->parseInt($row[24] ?? ''),
-
-                    // HPS/Pengadaan - Σ Biaya (Rp) 1-4
-                    'hps_biaya_1'        => $this->parseNum($row[25] ?? ''),
-                    'hps_biaya_2'        => $this->parseNum($row[26] ?? ''),
-                    'hps_biaya_3'        => $this->parseNum($row[27] ?? ''),
-                    'hps_biaya_4'        => $this->parseNum($row[28] ?? ''),
-                    // HPS - Σ Paket breakdown 1-4
-                    'hps_paket_1'        => $this->parseInt($row[29] ?? ''),
-                    'hps_paket_2'        => $this->parseInt($row[30] ?? ''),
-                    'hps_paket_3'        => $this->parseInt($row[31] ?? ''),
-                    'hps_paket_4'        => $this->parseInt($row[32] ?? ''),
-
-                    // SPPBJ/Kontrak - Σ Biaya (Rp) 1-4
-                    'sppbj_biaya_1'      => $this->parseNum($row[33] ?? ''),
-                    'sppbj_biaya_2'      => $this->parseNum($row[34] ?? ''),
-                    'sppbj_biaya_3'      => $this->parseNum($row[35] ?? ''),
-                    'sppbj_biaya_4'      => $this->parseNum($row[36] ?? ''),
-                    // SPPBJ - Σ Paket breakdown 1-4
-                    'sppbj_paket_1'      => $this->parseInt($row[37] ?? ''),
-                    'sppbj_paket_2'      => $this->parseInt($row[38] ?? ''),
-                    'sppbj_paket_3'      => $this->parseInt($row[39] ?? ''),
-                    'sppbj_paket_4'      => $this->parseInt($row[40] ?? ''),
-
-                    // % Progress Thd RKAP setahun — starts at index 41
-                    'pct_diaj_biaya'     => $this->parseFloat($row[41] ?? ''),
-                    'pct_diaj_paket'     => $this->parseFloat($row[42] ?? ''),
-                    'pct_belum_biaya'    => $this->parseFloat($row[43] ?? ''),
-                    'pct_belum_paket'    => $this->parseFloat($row[44] ?? ''),
-                    'pct_hps_biaya'      => $this->parseFloat($row[45] ?? ''),
-                    'pct_hps_paket'      => $this->parseFloat($row[46] ?? ''),
-                    'pct_sppbj_biaya'    => $this->parseFloat($row[47] ?? ''),
-                    'pct_sppbj_paket'    => $this->parseFloat($row[48] ?? ''),
-
-                    '_is_subtotal'       => $this->isSubtotalRow($row[0] ?? ''),
-                ];
-            }
-
+        if (empty($rows)) {
             return [
-                'title'   => $title,
-                'date'    => $date,
-                'records' => $records,
+                'title'   => '',
+                'date'    => '',
+                'headers' => [],
+                'groups'  => [],
+                'records' => [],
             ];
-        });
+        }
+
+        // Baris 1 = judul utama (A1)
+        $title = $rows[0][0] ?? '';
+
+        // Baris 2 = tanggal (A2)
+        $date = $rows[1][0] ?? '';
+
+        // Cari start index per grup dari header sheet (row index 3),
+        // agar tahan terhadap pergeseran/penambahan kolom.
+        $groupRow = $rows[3] ?? [];
+        $subGroupRow = $rows[4] ?? [];
+        $colStart = [
+            'rkap'   => $this->findHeaderStart($groupRow, ['rkap', 'prioritas']) ?? 1,
+            'doku'   => $this->findHeaderStart($groupRow, ['dokumen', 'unit']) ?? 9,
+            'tekpol' => $this->findHeaderStart($groupRow, ['diajukan', 'tekpol']) ?? 17,
+            'hps'    => $this->findHeaderStart($groupRow, ['hps', 'pengadaan']) ?? 25,
+            'sppbj'  => $this->findHeaderStart($groupRow, ['sppbj', 'kontrak']) ?? 33,
+            'pct'    => $this->findHeaderStart($groupRow, ['progress', 'rkap']) ?? 41,
+        ];
+        $hasSplitTekpolProgress = $this->hasTekpolProgressSplit($subGroupRow, $colStart['pct']);
+
+        // Baris 4-6 = header grup & sub-header
+        // Berdasarkan screenshot, struktur:
+        // Row 4 (index 3): Unit Kerja | RKAP 2026 Rekg 045 Setahun (Prioritas) | Dokumen di Unit | Sudah diajukan Unit (Bag Tekpol) | HPS/Pengadaan | SPPBJ/Kontrak | %Progress Thd RKAP setahun (%)
+        // Row 5 (index 4): sub-header tiap grup
+        // Row 6 (index 5): sub-sub-header (1,2,3,4 dll)
+        // Row 7+ (index 6+): data
+
+        // Parse data records (dari baris ke-7, index 6)
+        $records = [];
+        for ($i = 6; $i < count($rows); $i++) {
+            $row = $rows[$i];
+            if (empty($row) || (empty($row[0]) && empty($row[1]))) {
+                continue; // skip baris kosong
+            }
+
+            // Struktur dibaca relatif dari start setiap grup:
+            // +0..+3 = Biaya(1..4), +4..+7 = Paket(1..4)
+            // Khusus progress: +0 DiajBiaya, +1 DiajPaket, +2 BelumBiaya, +3 BelumPaket, dst.
+
+            $records[] = [
+                'unit_kerja'         => $row[0] ?? '',
+
+                // RKAP 2026 - Σ Biaya (Rp) cols 1-4
+                'rkap_biaya_1'       => $this->parseNum($row[$colStart['rkap'] + 0] ?? ''),
+                'rkap_biaya_2'       => $this->parseNum($row[$colStart['rkap'] + 1] ?? ''),
+                'rkap_biaya_3'       => $this->parseNum($row[$colStart['rkap'] + 2] ?? ''),
+                'rkap_biaya_4'       => $this->parseNum($row[$colStart['rkap'] + 3] ?? ''),
+                // RKAP - Σ Paket breakdown 1-4
+                'rkap_paket_1'       => $this->parseInt($row[$colStart['rkap'] + 4] ?? ''),
+                'rkap_paket_2'       => $this->parseInt($row[$colStart['rkap'] + 5] ?? ''),
+                'rkap_paket_3'       => $this->parseInt($row[$colStart['rkap'] + 6] ?? ''),
+                'rkap_paket_4'       => $this->parseInt($row[$colStart['rkap'] + 7] ?? ''),
+
+                // Dokumen di Unit - Σ Biaya (Rp) cols 1-4
+                'doku_biaya_1'       => $this->parseNum($row[$colStart['doku'] + 0] ?? ''),
+                'doku_biaya_2'       => $this->parseNum($row[$colStart['doku'] + 1] ?? ''),
+                'doku_biaya_3'       => $this->parseNum($row[$colStart['doku'] + 2] ?? ''),
+                'doku_biaya_4'       => $this->parseNum($row[$colStart['doku'] + 3] ?? ''),
+                // Dokumen - Σ Paket breakdown 1-4
+                'doku_paket_1'       => $this->parseInt($row[$colStart['doku'] + 4] ?? ''),
+                'doku_paket_2'       => $this->parseInt($row[$colStart['doku'] + 5] ?? ''),
+                'doku_paket_3'       => $this->parseInt($row[$colStart['doku'] + 6] ?? ''),
+                'doku_paket_4'       => $this->parseInt($row[$colStart['doku'] + 7] ?? ''),
+
+                // Sudah Diajukan Unit (Bag Tekpol) - Σ Biaya (Rp) 1-4
+                'tekpol_biaya_1'     => $this->parseNum($row[$colStart['tekpol'] + 0] ?? ''),
+                'tekpol_biaya_2'     => $this->parseNum($row[$colStart['tekpol'] + 1] ?? ''),
+                'tekpol_biaya_3'     => $this->parseNum($row[$colStart['tekpol'] + 2] ?? ''),
+                'tekpol_biaya_4'     => $this->parseNum($row[$colStart['tekpol'] + 3] ?? ''),
+                // Tekpol - Σ Paket breakdown 1-4
+                'tekpol_paket_1'     => $this->parseInt($row[$colStart['tekpol'] + 4] ?? ''),
+                'tekpol_paket_2'     => $this->parseInt($row[$colStart['tekpol'] + 5] ?? ''),
+                'tekpol_paket_3'     => $this->parseInt($row[$colStart['tekpol'] + 6] ?? ''),
+                'tekpol_paket_4'     => $this->parseInt($row[$colStart['tekpol'] + 7] ?? ''),
+
+                // HPS/Pengadaan - Σ Biaya (Rp) 1-4
+                'hps_biaya_1'        => $this->parseNum($row[$colStart['hps'] + 0] ?? ''),
+                'hps_biaya_2'        => $this->parseNum($row[$colStart['hps'] + 1] ?? ''),
+                'hps_biaya_3'        => $this->parseNum($row[$colStart['hps'] + 2] ?? ''),
+                'hps_biaya_4'        => $this->parseNum($row[$colStart['hps'] + 3] ?? ''),
+                // HPS - Σ Paket breakdown 1-4
+                'hps_paket_1'        => $this->parseInt($row[$colStart['hps'] + 4] ?? ''),
+                'hps_paket_2'        => $this->parseInt($row[$colStart['hps'] + 5] ?? ''),
+                'hps_paket_3'        => $this->parseInt($row[$colStart['hps'] + 6] ?? ''),
+                'hps_paket_4'        => $this->parseInt($row[$colStart['hps'] + 7] ?? ''),
+
+                // SPPBJ/Kontrak - Σ Biaya (Rp) 1-4
+                'sppbj_biaya_1'      => $this->parseNum($row[$colStart['sppbj'] + 0] ?? ''),
+                'sppbj_biaya_2'      => $this->parseNum($row[$colStart['sppbj'] + 1] ?? ''),
+                'sppbj_biaya_3'      => $this->parseNum($row[$colStart['sppbj'] + 2] ?? ''),
+                'sppbj_biaya_4'      => $this->parseNum($row[$colStart['sppbj'] + 3] ?? ''),
+                // SPPBJ - Σ Paket breakdown 1-4
+                'sppbj_paket_1'      => $this->parseInt($row[$colStart['sppbj'] + 4] ?? ''),
+                'sppbj_paket_2'      => $this->parseInt($row[$colStart['sppbj'] + 5] ?? ''),
+                'sppbj_paket_3'      => $this->parseInt($row[$colStart['sppbj'] + 6] ?? ''),
+                'sppbj_paket_4'      => $this->parseInt($row[$colStart['sppbj'] + 7] ?? ''),
+
+                // % Progress Thd RKAP setahun
+                // Format baru (10 kolom): Posisi, Diterima, Tekpol, HPS, SPPBJ (masing-masing Biaya/Paket)
+                // Format lama (8 kolom): Diajukan, Belum/Posisi, HPS, SPPBJ
+                'pct_belum_biaya'    => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 0] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 2] ?? ''),
+                'pct_belum_paket'    => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 1] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 3] ?? ''),
+
+                'pct_diterima_biaya' => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 2] ?? '')
+                    : null,
+                'pct_diterima_paket' => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 3] ?? '')
+                    : null,
+
+                'pct_tekpol_biaya'   => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 4] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 0] ?? ''),
+                'pct_tekpol_paket'   => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 5] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 1] ?? ''),
+
+                'pct_hps_biaya'      => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 6] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 4] ?? ''),
+                'pct_hps_paket'      => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 7] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 5] ?? ''),
+                'pct_sppbj_biaya'    => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 8] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 6] ?? ''),
+                'pct_sppbj_paket'    => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 9] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 7] ?? ''),
+
+                // Backward compatibility untuk view/chart lama:
+                'pct_diaj_biaya'     => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 4] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 0] ?? ''),
+                'pct_diaj_paket'     => $hasSplitTekpolProgress
+                    ? $this->parseFloat($row[$colStart['pct'] + 5] ?? '')
+                    : $this->parseFloat($row[$colStart['pct'] + 1] ?? ''),
+
+                '_is_subtotal'       => $this->isSubtotalRow($row[0] ?? ''),
+            ];
+        }
+
+        return [
+            'title'   => $title,
+            'date'    => $date,
+            'records' => $records,
+        ];
     }
 
     /**
@@ -224,5 +279,43 @@ class PrioritasSheetService
         $cleaned = str_replace(['%', ' '], '', $value);
         $cleaned = str_replace(',', '.', $cleaned);
         return is_numeric($cleaned) ? (float)$cleaned : null;
+    }
+
+    protected function findHeaderStart(array $row, array $needles): ?int
+    {
+        foreach ($row as $idx => $cell) {
+            $text = $this->normalizeText((string) $cell);
+            if ($text === '') {
+                continue;
+            }
+
+            $matchedAll = true;
+            foreach ($needles as $needle) {
+                if (!str_contains($text, $this->normalizeText($needle))) {
+                    $matchedAll = false;
+                    break;
+                }
+            }
+
+            if ($matchedAll) {
+                return (int) $idx;
+            }
+        }
+
+        return null;
+    }
+
+    protected function hasTekpolProgressSplit(array $row, int $pctStart): bool
+    {
+        $window = array_slice($row, $pctStart, 12);
+        $text = $this->normalizeText(implode(' ', array_map(fn($v) => (string) $v, $window)));
+        return str_contains($text, 'diterima') && str_contains($text, 'tekpol');
+    }
+
+    protected function normalizeText(string $value): string
+    {
+        $value = strtolower(trim($value));
+        $value = preg_replace('/\s+/', ' ', $value);
+        return $value ?? '';
     }
 }

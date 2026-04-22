@@ -968,7 +968,7 @@ main {
                         <th colspan="8" class="h-tekpol">Sudah diajukan Unit (Bag Tekpol)</th>
                         <th colspan="8" class="h-hps">HPS/Pengadaan</th>
                         <th colspan="8" class="h-sppbj">SPPBJ/Kontrak</th>
-                        <th colspan="8" class="h-pct pct-col">%ProgressThdp RKAP setahun (%)</th>
+                        <th colspan="10" class="h-pct pct-col">%ProgressThdp RKAP setahun (%)</th>
                     </tr>
                     <tr>
                         {{-- 5 stage × (Σ Biaya + Σ Paket) --}}
@@ -976,9 +976,10 @@ main {
                             <th colspan="4" class="sub-biaya">Σ Biaya (Rp)</th>
                             <th colspan="4" class="sub-paket">Σ Paket</th>
                         @endfor
-                        {{-- Progress: Posisi Unit | Diterima Tekpol | HPS/Pengadaan | SPPBJ/Kontrak --}}
+                        {{-- Progress: Posisi Unit | Diterima | Tekpol | HPS/Pengadaan | SPPBJ/Kontrak --}}
                         <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">Posisi Unit</th>
-                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">Diterima Tekpol</th>
+                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">Diterima</th>
+                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">Tekpol</th>
                         <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">HPS/Pengadaan</th>
                         <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">SPPBJ/Kontrak</th>
                     </tr>
@@ -994,7 +995,8 @@ main {
                             <th class="w-paket q-paket">3</th>
                             <th class="w-paket q-paket">4</th>
                         @endfor
-                        {{-- Progress sub-sub: Biaya|Paket per 4 kategori --}}
+                        {{-- Progress sub-sub: Biaya|Paket per 5 kategori --}}
+                        <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
                         <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
                         <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
                         <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
@@ -1015,11 +1017,27 @@ main {
                                 ? '<span class="val-dim">—</span>'
                                 : $v;
 
-                            $getBadge = function($v) use ($isSub) {
+                            $getBadge = function($v, $rule = 'default') use ($isSub) {
                                 if ($v === null || $v == 0) return '<span class="val-dim">—</span>';
-                                if ($isSub) return '<strong>'.number_format($v, 1, ',', '.').'%</strong>';
-                                $cls = ($v >= 80) ? 'badge-green' : (($v >= 50) ? 'badge-amber' : 'badge-red');
-                                return '<span class="badge-pct '.$cls.'">'.number_format($v, 1, ',', '.').'%</span>';
+                                $text = number_format($v, 1, ',', '.').'%';
+
+                                // Baris subtotal: bold tanpa warna
+                                if ($isSub) return '<strong>'.$text.'</strong>';
+
+                                // Kolom netral: tampilkan teks saja
+                                if ($rule === 'plain') {
+                                    return '<span>'.$text.'</span>';
+                                }
+
+                                if ($rule === 'inverse-20') {
+                                    $cls = ($v > 20) ? 'badge-red' : 'badge-green';
+                                } elseif ($rule === 'contract-30-70') {
+                                    $cls = ($v < 30) ? 'badge-red' : (($v < 70) ? 'badge-amber' : 'badge-green');
+                                } else {
+                                    $cls = ($v >= 80) ? 'badge-green' : (($v >= 50) ? 'badge-amber' : 'badge-red');
+                                }
+
+                                return '<span class="badge-pct '.$cls.'">'.$text.'</span>';
                             };
                         @endphp
                         <tr class="{{ $rowClass }}">
@@ -1044,15 +1062,17 @@ main {
                                 @endfor
                             @endforeach
 
-                            {{-- Progress: Posisi Unit B%|P%, Diterima Tekpol B%|P%, HPS B%|P%, SPPBJ B%|P% --}}
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_belum_biaya']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_belum_paket']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diaj_biaya']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diaj_paket']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_hps_biaya']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_hps_paket']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_sppbj_biaya']) !!}</td>
-                            <td class="w-pct pct-col">{!! $getBadge($row['pct_sppbj_paket']) !!}</td>
+                            {{-- Progress: Posisi Unit, Diterima, Tekpol, HPS, SPPBJ --}}
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_belum_biaya'], 'inverse-20') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_belum_paket'], 'inverse-20') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diterima_biaya'] ?? null, 'plain') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diterima_paket'] ?? null, 'plain') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diaj_biaya'], 'inverse-20') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diaj_paket'], 'inverse-20') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_hps_biaya'], 'plain') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_hps_paket'], 'plain') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_sppbj_biaya'], 'contract-30-70') !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_sppbj_paket'], 'contract-30-70') !!}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -1177,11 +1197,24 @@ function exportPDF() {
     // Helper format angka
     const fmtRp = v => (v === null || v == 0) ? '<span class="val-dim-pdf">—</span>' : Number(v).toLocaleString('id-ID');
     const fmtPk = v => (v === null || v == 0) ? '<span class="val-dim-pdf">—</span>' : v;
-    const fmtBg = v => {
+    const fmtBg = (v, rule = 'default', isSubtotal = false) => {
         if (v === null || v == 0) return '<span class="val-dim-pdf">—</span>';
         const n = parseFloat(v);
-        const cls = n >= 80 ? 'badge-pdf-green' : (n >= 50 ? 'badge-pdf-amber' : 'badge-pdf-red');
-        return `<span class="${cls}">${n.toFixed(1)}%</span>`;
+        const text = `${n.toFixed(1)}%`;
+
+        if (isSubtotal || rule === 'plain') {
+            return `<span>${text}</span>`;
+        }
+
+        let cls;
+        if (rule === 'inverse-20') {
+            cls = n > 20 ? 'badge-pdf-red' : 'badge-pdf-green';
+        } else if (rule === 'contract-30-70') {
+            cls = n < 30 ? 'badge-pdf-red' : (n < 70 ? 'badge-pdf-amber' : 'badge-pdf-green');
+        } else {
+            cls = n >= 80 ? 'badge-pdf-green' : (n >= 50 ? 'badge-pdf-amber' : 'badge-pdf-red');
+        }
+        return `<span class="${cls}">${text}</span>`;
     };
 
     // Kolom stage
@@ -1202,15 +1235,27 @@ function exportPDF() {
           bKeys: ['sppbj_biaya_1','sppbj_biaya_2','sppbj_biaya_3','sppbj_biaya_4'],
           pKeys: ['sppbj_paket_1','sppbj_paket_2','sppbj_paket_3','sppbj_paket_4'] },
     ];
-        const pctLabels    = ['Posisi Unit','Diterima Tekpol','HPS/Pengadaan','SPPBJ/Kontrak'];
+        const pctLabels    = ['Posisi Unit','Diterima','Tekpol','HPS/Pengadaan','SPPBJ/Kontrak'];
 
     // ── Builder tabel HTML ──
     function buildTable(mode) {
         const isBiaya = mode === 'biaya';
         const keys    = isBiaya ? stages.map(s=>s.bKeys) : stages.map(s=>s.pKeys);
         const pctKeys = isBiaya
-            ? ['pct_belum_biaya','pct_diaj_biaya','pct_hps_biaya','pct_sppbj_biaya']
-            : ['pct_belum_paket','pct_diaj_paket','pct_hps_paket','pct_sppbj_paket'];
+            ? [
+                ['pct_belum_biaya', 'inverse-20'],
+                ['pct_diterima_biaya', 'plain'],
+                ['pct_diaj_biaya', 'inverse-20'],
+                ['pct_hps_biaya', 'plain'],
+                ['pct_sppbj_biaya', 'contract-30-70']
+            ]
+            : [
+                ['pct_belum_paket', 'inverse-20'],
+                ['pct_diterima_paket', 'plain'],
+                ['pct_diaj_paket', 'inverse-20'],
+                ['pct_hps_paket', 'plain'],
+                ['pct_sppbj_paket', 'contract-30-70']
+            ];
         const subClass = isBiaya ? 'sub-biaya-pdf' : 'sub-paket-pdf';
         const qClass   = isBiaya ? 'q-biaya-pdf' : 'q-paket-pdf';
         const subLabel = isBiaya ? 'Σ Biaya (Rp)' : 'Σ Paket';
@@ -1253,8 +1298,8 @@ function exportPDF() {
                     html += `<td style="background:${bg};">${fmt(row[k])}</td>`;
                 });
             });
-            pctKeys.forEach((k) => {
-                html += `<td style="text-align:center;background:#f2f7fc;">${fmtBg(row[k])}</td>`;
+            pctKeys.forEach(([k, rule]) => {
+                html += `<td style="text-align:center;background:#f2f7fc;">${fmtBg(row[k], rule, !!row._is_subtotal)}</td>`;
             });
             html += '</tr>';
         });
