@@ -10,13 +10,13 @@
     $date    = $data['date']  ?? '';
 
     // ── Aggregate totals dari records (skip subtotal rows) ───────────────
-    $dataRows = array_filter($records, fn($r) => !$r['_is_subtotal']);
+    $dataRows = array_filter($records, fn($r) => !($r['_is_subtotal'] ?? false));
 
-    $totalRkap    = array_sum(array_map(fn($r) => ($r['rkap_biaya_1'] + $r['rkap_biaya_2'] + $r['rkap_biaya_3'] + $r['rkap_biaya_4']), $dataRows));
-    $totalDoku    = array_sum(array_map(fn($r) => ($r['doku_biaya_1'] + $r['doku_biaya_2'] + $r['doku_biaya_3'] + $r['doku_biaya_4']), $dataRows));
-    $totalDiaj    = array_sum(array_map(fn($r) => ($r['tekpol_biaya_1'] + $r['tekpol_biaya_2'] + $r['tekpol_biaya_3'] + $r['tekpol_biaya_4']), $dataRows));
-    $totalHps     = array_sum(array_map(fn($r) => ($r['hps_biaya_1'] + $r['hps_biaya_2'] + $r['hps_biaya_3'] + $r['hps_biaya_4']), $dataRows));
-    $totalSppbj   = array_sum(array_map(fn($r) => ($r['sppbj_biaya_1'] + $r['sppbj_biaya_2'] + $r['sppbj_biaya_3'] + $r['sppbj_biaya_4']), $dataRows));
+    $totalRkap    = array_sum(array_map(fn($r) => (($r['rkap_biaya_1']??0) + ($r['rkap_biaya_2']??0) + ($r['rkap_biaya_3']??0) + ($r['rkap_biaya_4']??0)), $dataRows));
+    $totalDoku    = array_sum(array_map(fn($r) => (($r['doku_biaya_1']??0) + ($r['doku_biaya_2']??0) + ($r['doku_biaya_3']??0) + ($r['doku_biaya_4']??0)), $dataRows));
+    $totalDiaj    = array_sum(array_map(fn($r) => (($r['tekpol_biaya_1']??0) + ($r['tekpol_biaya_2']??0) + ($r['tekpol_biaya_3']??0) + ($r['tekpol_biaya_4']??0)), $dataRows));
+    $totalHps     = array_sum(array_map(fn($r) => (($r['hps_biaya_1']??0) + ($r['hps_biaya_2']??0) + ($r['hps_biaya_3']??0) + ($r['hps_biaya_4']??0)), $dataRows));
+    $totalSppbj   = array_sum(array_map(fn($r) => (($r['sppbj_biaya_1']??0) + ($r['sppbj_biaya_2']??0) + ($r['sppbj_biaya_3']??0) + ($r['sppbj_biaya_4']??0)), $dataRows));
 
     $pctDiaj  = $totalRkap > 0 ? round(($totalDiaj / $totalRkap) * 100, 1) : 0;
     $pctHps   = $totalRkap > 0 ? round(($totalHps  / $totalRkap) * 100, 1) : 0;
@@ -45,7 +45,7 @@
         $chartSppbj[]  = $r['pct_sppbj_biaya'] ?? 0;
     }
 
-    $fmtRp = fn($v) => 'Rp ' . number_format($v / 1_000_000, 0, ',', '.') . ' Jt';
+    $fmtRp = fn($v) => 'Rp ' . number_format(($v ?? 0) / 1_000_000, 0, ',', '.') . ' Jt';
 @endphp
 
 @push('styles')
@@ -526,8 +526,8 @@ main {
 }
 
 #prioritas-table th {
-    background: #f8fafc;
-    color: #475569;
+    background: #d9ead3;
+    color: #1f2937;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.03em;
@@ -540,13 +540,52 @@ main {
     white-space: nowrap;
 }
 
-/* Stage Headers */
-.h-rkap    { border-top: 3px solid var(--rkap-clr)   !important; background: #fff7ed !important; color: #9a3412 !important; }
-.h-doku    { border-top: 3px solid var(--doku-clr)   !important; background: #eff6ff !important; color: #1e40af !important; }
-.h-tekpol  { border-top: 3px solid var(--tekpol-clr) !important; background: #ecfdf5 !important; color: #065f46 !important; }
-.h-hps     { border-top: 3px solid var(--hps-clr)    !important; background: #f5f3ff !important; color: #5b21b6 !important; }
-.h-sppbj   { border-top: 3px solid var(--sppbj-clr)  !important; background: #fff1f2 !important; color: #9f1239 !important; }
-.h-pct     { border-top: 3px solid var(--pct-clr)    !important; background: #ecfeff !important; color: #164e63 !important; }
+/* Spreadsheet-like Header Colors */
+.h-rkap, .h-doku, .h-tekpol, .h-hps, .h-sppbj {
+    border-top: 2px solid #2f6b3b !important;
+    background: #b6d7a8 !important;
+    color: #000 !important;
+}
+.h-pct {
+    border-top: 2px solid #1f4e79 !important;
+    background: #9fc5e8 !important;
+    color: #000 !important;
+}
+
+.sub-biaya {
+    background: #d9ead3 !important;
+    color: #000 !important;
+    font-style: normal !important;
+    font-size: 9px !important;
+}
+.sub-paket {
+    background: #fce5cd !important;
+    color: #000 !important;
+    font-style: normal !important;
+    font-size: 9px !important;
+}
+.sub-pct {
+    background: #cfe2f3 !important;
+    color: #000 !important;
+    font-style: normal !important;
+    font-size: 9px !important;
+}
+
+.q-biaya {
+    background: #d9ead3 !important;
+    color: #000 !important;
+    font-size: 9px !important;
+}
+.q-paket {
+    background: #fce5cd !important;
+    color: #000 !important;
+    font-size: 9px !important;
+}
+.q-pct {
+    background: #cfe2f3 !important;
+    color: #000 !important;
+    font-size: 9px !important;
+}
 
 #prioritas-table thead tr:nth-child(2) th { top: 36px; }
 #prioritas-table thead tr:nth-child(3) th { top: 68px; font-size: 9px; }
@@ -563,7 +602,11 @@ main {
     font-weight: 500;
     color: var(--text-head);
 }
-#prioritas-table thead .sticky-col { z-index: 50; background: #f8fafc; }
+#prioritas-table thead .sticky-col {
+    z-index: 50;
+    background: #b6d7a8;
+    color: #000;
+}
 
 /* Row Styles */
 #prioritas-table tbody tr:nth-child(even) td { background: #fafcff; }
@@ -593,33 +636,143 @@ main {
 .badge-amber { background: #fef3c7; color: #92400e; border-color: #fde68a; }
 .badge-red   { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
 
-/* Widths */
-.w-biaya { min-width: 100px; width: 100px; }
-.w-paket { min-width: 55px;  width: 55px;  text-align: center !important; }
-.w-pct   { min-width: 72px;  width: 72px;  text-align: center !important; }
+/* Widths — lebih compact karena biaya+paket tampil sekaligus */
+.w-biaya { min-width: 76px; width: 76px; }
+.w-paket { min-width: 38px; width: 38px; text-align: center !important; }
+.w-pct   { min-width: 58px; width: 58px; text-align: center !important; }
 
-/* Tab Logic */
-#prioritas-table.tab-biaya .tab-content-paket { display: none !important; }
-#prioritas-table.tab-paket .tab-content-biaya { display: none !important; }
+/* Semua kolom biaya & paket selalu tampil (tidak ada tab toggle) */
 .tab-hidden { display: none !important; }
 
 /* ── PRINT COMPATIBILITY ────────────────────────────────── */
 @media print {
-    @page { size: landscape; margin: 10mm; }
+    @page { size: landscape; margin: 0.5cm; }
     body * { visibility: hidden !important; }
     .table-card, .table-card * { visibility: visible !important; }
-    .table-card { position: absolute; left: 0; top: 0; width: 100vw; border: none; box-shadow: none; margin: 0; padding: 0; }
+    .table-card { 
+        position: absolute; left: 0; top: 0; width: 100%; 
+        border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; 
+    }
     .table-toolbar { display: none !important; }
-    .table-scroller { max-height: none !important; overflow: visible !important; border: none; }
+    .table-scroller { max-height: none !important; overflow: visible !important; border: none !important; }
     
     #print-header { display: block !important; margin-bottom: 20px !important; }
 
-    #prioritas-table { width: 100%; border-collapse: collapse; font-size: 7.5pt !important; }
-    #prioritas-table th, #prioritas-table td { border: 1px solid #cbd5e1 !important; color: #000 !important; padding: 4px !important; }
-    #prioritas-table th { background: #f8fafc !important; }
-    #prioritas-table th.sticky-col, #prioritas-table td.sticky-col { position: static !important; }
-    .badge-pct { border: 1px solid #000 !important; padding: 1px 3px !important; font-size: 6.5pt !important; }
+    #prioritas-table { 
+        width: 100% !important; border-collapse: collapse !important; 
+        font-size: 8pt !important; table-layout: auto !important;
+    }
+    #prioritas-table th, #prioritas-table td { 
+        border: 0.5pt solid #94a3b8 !important; 
+        color: #000 !important; padding: 4px 2px !important;
+        position: static !important; /* Nonaktifkan sticky untuk print */
+    }
+    #prioritas-table th { background: #f1f5f9 !important; font-weight: bold !important; }
+    
+    /* Warna stage untuk print agar tetap terlihat */
+    .h-rkap { background: #fff7ed !important; border-top: 2pt solid #f97316 !important; }
+    .h-doku { background: #eff6ff !important; border-top: 2pt solid #3b82f6 !important; }
+    .h-tekpol { background: #ecfdf5 !important; border-top: 2pt solid #10b981 !important; }
+    .h-hps { background: #f5f3ff !important; border-top: 2pt solid #8b5cf6 !important; }
+    .h-sppbj { background: #fff1f2 !important; border-top: 2pt solid #f43f5e !important; }
+    .h-pct { background: #ecfeff !important; border-top: 2pt solid #06b6d4 !important; }
+
+    .badge-pct { border: 0.5pt solid #64748b !important; padding: 1px 3px !important; font-size: 7pt !important; }
+    .val-dim { color: #94a3b8 !important; }
 }
+
+/* KELAS KHUSUS UNTUK EKSPOR PDF (AGAR TIDAK STICKY) */
+.pdf-mode #prioritas-table th, 
+.pdf-mode #prioritas-table td,
+.pdf-mode #prioritas-table .sticky-col {
+    position: static !important;
+    box-shadow: none !important;
+    border-right: 1px solid var(--border) !important;
+}
+.pdf-mode .table-scroller {
+    max-height: none !important;
+    overflow: visible !important;
+}
+
+/* PDF Export: layout dua tabel dalam satu halaman */
+#pdf-export-container {
+    background: #fff;
+    padding: 0px;
+    font-family: 'Inter', sans-serif;
+}
+#pdf-export-container .pdf-section {
+    margin-bottom: 8px;
+}
+#pdf-export-container .pdf-doc-header {
+    text-align: center;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid #cbd5e1;
+}
+#pdf-export-container .pdf-doc-header h2 {
+    margin:0; font-size:11pt; font-weight:800; color:#1e293b;
+    text-transform:uppercase; letter-spacing:0.5px;
+}
+#pdf-export-container .pdf-doc-header p {
+    margin:2px 0 0; font-size:7.5pt; color:#475569; font-weight:600;
+}
+#pdf-export-container .pdf-section-title {
+    font-size: 7.5pt; font-weight: 700; color: #1f2937;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    background: #d9ead3; border-left: 3px solid #2f6b3b;
+    padding: 3px 8px; margin-bottom: 4px;
+}
+#pdf-export-container table {
+    width: 100%; border-collapse: collapse;
+    font-size: 6.5pt;
+    table-layout: auto;
+}
+#pdf-export-container table th {
+    background: #d9ead3; color: #000;
+    font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.02em; padding: 3px 4px;
+    border: 0.5pt solid #94a3b8;
+    white-space: nowrap;
+}
+#pdf-export-container table td {
+    padding: 2.5px 4px;
+    border: 0.5pt solid #cbd5e1;
+    text-align: right;
+    font-size: 6.2pt;
+}
+#pdf-export-container table td.col-unit {
+    text-align: left; font-weight: 500;
+    white-space: nowrap; font-size: 6.2pt;
+}
+#pdf-export-container table tr.pdf-subtotal td {
+    background: #eff6ff !important;
+    font-weight: 800; color: #1e40af;
+    border-bottom: 1pt solid #3b82f6;
+}
+#pdf-export-container .h-rkap-pdf,
+#pdf-export-container .h-doku-pdf,
+#pdf-export-container .h-tekpol-pdf,
+#pdf-export-container .h-hps-pdf,
+#pdf-export-container .h-sppbj-pdf {
+    border-top: 2pt solid #2f6b3b !important;
+    background: #b6d7a8 !important;
+    color: #000 !important;
+}
+#pdf-export-container .h-pct-pdf {
+    border-top: 2pt solid #1f4e79 !important;
+    background: #9fc5e8 !important;
+    color: #000 !important;
+}
+#pdf-export-container .sub-biaya-pdf { background: #d9ead3 !important; color: #000 !important; }
+#pdf-export-container .sub-paket-pdf { background: #fce5cd !important; color: #000 !important; }
+#pdf-export-container .sub-pct-pdf   { background: #cfe2f3 !important; color: #000 !important; }
+#pdf-export-container .q-biaya-pdf   { background: #d9ead3 !important; color: #000 !important; }
+#pdf-export-container .q-paket-pdf   { background: #fce5cd !important; color: #000 !important; }
+#pdf-export-container .q-pct-pdf     { background: #cfe2f3 !important; color: #000 !important; }
+#pdf-export-container .val-dim-pdf  { color: #cbd5e1; }
+#pdf-export-container .badge-pdf-green { background:#dcfce7; color:#166534; border:0.3pt solid #86efac; border-radius:2px; padding:0.5px 3px; }
+#pdf-export-container .badge-pdf-amber { background:#fef3c7; color:#92400e; border:0.3pt solid #fde68a; border-radius:2px; padding:0.5px 3px; }
+#pdf-export-container .badge-pdf-red   { background:#fee2e2; color:#991b1b; border:0.3pt solid #fca5a5; border-radius:2px; padding:0.5px 3px; }
 
 /* RESPONSIVE */
 @media (max-width: 1280px) {
@@ -784,9 +937,8 @@ main {
                     <div class="live-dot"></div>
                     Data Real-Time
                 </div>
-                <div class="tab-switcher">
-                    <div class="tab-btn active" onclick="switchTab('biaya')">Monitoring Biaya</div>
-                    <div class="tab-btn" onclick="switchTab('paket')">Monitoring Paket</div>
+                <div style="font-size:0.68rem;font-weight:700;color:var(--blue-700);background:var(--blue-50);border:1.5px solid var(--blue-200);padding:4px 12px;border-radius:8px;letter-spacing:0.04em;text-transform:uppercase;">
+                    Monitoring Biaya &amp; Paket
                 </div>
             </div>
             <div class="toolbar-right" style="display:flex; align-items:center; gap:0.6rem;">
@@ -797,53 +949,56 @@ main {
                     </svg>
                     Toggle %
                 </button>
-                <div style="position:relative;" id="export-dropdown-wrapper">
-                    <button onclick="toggleExportMenu()" class="btn-sm" style="background:var(--blue-600); color:#fff; border-color:var(--blue-700);">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-                        </svg>
-                        Export PDF
-                    </button>
-                    <div id="exportMenu" class="tab-hidden" style="position:absolute; right:0; top:110%; background:#fff; border:1px solid var(--border); box-shadow:var(--shadow-md); border-radius:8px; z-index:99; display:flex; flex-direction:column; min-width:140px; overflow:hidden;">
-                        <a onclick="exportPDF('biaya')" style="padding:0.6rem 1rem; font-size:0.65rem; font-weight:700; cursor:pointer; border-bottom:1px solid #f1f5f9; color:var(--text-body);">Tabel Biaya</a>
-                        <a onclick="exportPDF('paket')" style="padding:0.6rem 1rem; font-size:0.65rem; font-weight:700; cursor:pointer; border-bottom:1px solid #f1f5f9; color:var(--text-body);">Tabel Paket</a>
-                        <a onclick="exportPDF('semua')" style="padding:0.6rem 1rem; font-size:0.65rem; font-weight:700; cursor:pointer; color:var(--text-body);">Tabel Keduanya</a>
-                    </div>
-                </div>
+                <button id="btn-export-pdf" onclick="exportPDF()" class="btn-sm" style="background:var(--blue-600); color:#fff; border-color:var(--blue-700);">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    Export PDF
+                </button>
             </div>
         </div>
 
         <div class="table-scroller">
-            <table id="prioritas-table" class="tab-biaya">
+            <table id="prioritas-table">
                 <thead>
                     <tr>
                         <th rowspan="3" class="sticky-col">Unit Kerja</th>
-                        <th colspan="4" class="h-rkap stage-header">RKAP 2026 Setahun</th>
-                        <th colspan="4" class="h-doku stage-header">Dokumen di Unit</th>
-                        <th colspan="4" class="h-tekpol stage-header">Sudah Diajukan</th>
-                        <th colspan="4" class="h-hps stage-header">HPS / Pengadaan</th>
-                        <th colspan="4" class="h-sppbj stage-header">SPPBJ / Kontrak</th>
-                        <th colspan="4" class="h-pct pct-col stage-header">Progress (%)</th>
+                        <th colspan="8" class="h-rkap">RKAP 2026 Rekg 045 Setahun (Prioritas)</th>
+                        <th colspan="8" class="h-doku">Dokumen di Unit</th>
+                        <th colspan="8" class="h-tekpol">Sudah diajukan Unit (Bag Tekpol)</th>
+                        <th colspan="8" class="h-hps">HPS/Pengadaan</th>
+                        <th colspan="8" class="h-sppbj">SPPBJ/Kontrak</th>
+                        <th colspan="8" class="h-pct pct-col">%ProgressThdp RKAP setahun (%)</th>
                     </tr>
                     <tr>
+                        {{-- 5 stage × (Σ Biaya + Σ Paket) --}}
                         @for($i=0; $i<5; $i++)
-                            <th colspan="4" class="tab-content-biaya">Σ Biaya (Rp)</th>
-                            <th colspan="4" class="tab-content-paket">Σ Paket</th>
+                            <th colspan="4" class="sub-biaya">Σ Biaya (Rp)</th>
+                            <th colspan="4" class="sub-paket">Σ Paket</th>
                         @endfor
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">Diajukan</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-paket">Diajukan</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">Belum</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-paket">Belum</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">HPS</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-paket">HPS</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-biaya">SPPBJ</th>
-                        <th colspan="1" rowspan="2" class="pct-col tab-content-paket">SPPBJ</th>
+                        {{-- Progress: Posisi Unit | Diterima Tekpol | HPS/Pengadaan | SPPBJ/Kontrak --}}
+                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">Posisi Unit</th>
+                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">Diterima Tekpol</th>
+                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">HPS/Pengadaan</th>
+                        <th colspan="2" class="pct-col sub-pct" style="font-size:9px;">SPPBJ/Kontrak</th>
                     </tr>
                     <tr>
+                        {{-- Kuartal per stage: 1 2 3 4 (biaya) | 1 2 3 4 (paket) --}}
                         @for($g=0; $g<5; $g++)
-                            <th class="w-biaya tab-content-biaya">I</th><th class="w-biaya tab-content-biaya">II</th><th class="w-biaya tab-content-biaya">III</th><th class="w-biaya tab-content-biaya">IV</th>
-                            <th class="w-paket tab-content-paket">I</th><th class="w-paket tab-content-paket">II</th><th class="w-paket tab-content-paket">III</th><th class="w-paket tab-content-paket">IV</th>
+                            <th class="w-biaya q-biaya">1</th>
+                            <th class="w-biaya q-biaya">2</th>
+                            <th class="w-biaya q-biaya">3</th>
+                            <th class="w-biaya q-biaya">4</th>
+                            <th class="w-paket q-paket">1</th>
+                            <th class="w-paket q-paket">2</th>
+                            <th class="w-paket q-paket">3</th>
+                            <th class="w-paket q-paket">4</th>
                         @endfor
+                        {{-- Progress sub-sub: Biaya|Paket per 4 kategori --}}
+                        <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
+                        <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
+                        <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
+                        <th class="pct-col q-pct">Biaya</th><th class="pct-col q-pct">Paket</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -882,21 +1037,22 @@ main {
 
                             @foreach($stages as $stageCols)
                                 @for($i=0; $i<4; $i++)
-                                    <td class="val-num tab-content-biaya">{!! $fmtBiaya($row[$stageCols[$i]]) !!}</td>
+                                    <td class="val-num" style="background:#fffbf7;">{!! $fmtBiaya($row[$stageCols[$i]]) !!}</td>
                                 @endfor
                                 @for($i=4; $i<8; $i++)
-                                    <td class="val-num w-paket tab-content-paket">{!! $fmtPaket($row[$stageCols[$i]]) !!}</td>
+                                    <td class="val-num w-paket" style="background:#f8faff;">{!! $fmtPaket($row[$stageCols[$i]]) !!}</td>
                                 @endfor
                             @endforeach
 
-                            <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_diaj_biaya']) !!}</td>
-                            <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_diaj_paket']) !!}</td>
-                            <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_belum_biaya']) !!}</td>
-                            <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_belum_paket']) !!}</td>
-                            <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_hps_biaya']) !!}</td>
-                            <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_hps_paket']) !!}</td>
-                            <td class="w-pct pct-col tab-content-biaya">{!! $getBadge($row['pct_sppbj_biaya']) !!}</td>
-                            <td class="w-pct pct-col tab-content-paket">{!! $getBadge($row['pct_sppbj_paket']) !!}</td>
+                            {{-- Progress: Posisi Unit B%|P%, Diterima Tekpol B%|P%, HPS B%|P%, SPPBJ B%|P% --}}
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_belum_biaya']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_belum_paket']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diaj_biaya']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_diaj_paket']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_hps_biaya']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_hps_paket']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_sppbj_biaya']) !!}</td>
+                            <td class="w-pct pct-col">{!! $getBadge($row['pct_sppbj_paket']) !!}</td>
                         </tr>
                     @endforeach
                 </tbody>
@@ -999,93 +1155,161 @@ main {
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
-// ── Tab Switcher ──────────────────────────────────────────
-function switchTab(tab) {
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.innerText.toLowerCase().includes(tab)) btn.classList.add('active');
-    });
-    const table = document.getElementById('prioritas-table');
-    table.classList.remove('tab-biaya', 'tab-paket');
-    table.classList.add('tab-' + tab);
-}
-
 function togglePctCols() {
     document.querySelectorAll('.pct-col').forEach(c => c.classList.toggle('tab-hidden'));
 }
 
-// ── Export Dropdown Logic ─────────────────────────────────
-function toggleExportMenu() {
-    const menu = document.getElementById('exportMenu');
-    if (menu.classList.contains('tab-hidden')) {
-        menu.classList.remove('tab-hidden');
-    } else {
-        menu.classList.add('tab-hidden');
-    }
-}
-document.addEventListener('click', function(e) {
-    if (!document.getElementById('export-dropdown-wrapper').contains(e.target)) {
-        document.getElementById('exportMenu').classList.add('tab-hidden');
-    }
-});
+// ── Export PDF Logic (Dua Tabel dalam Satu Halaman Landscape) ────────────
+function exportPDF() {
+    const btn = document.getElementById('btn-export-pdf');
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width:14px;height:14px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Rendering...';
+    btn.style.opacity = '0.7';
+    btn.disabled = true;
 
-// ── Export PDF Logic ──────────────────────────────────────
-function exportPDF(mode) {
-    document.getElementById('exportMenu').classList.add('tab-hidden');
-    
-    // 1. Clone seluruh DOM table-card untuk menghindari konflik layout (sidebar/viewport overflow)
-    const originalCard = document.querySelector('.table-card');
-    const cloneCard = originalCard.cloneNode(true);
-    
-    // 2. Buat container rahasia di pojok (0,0) agar tidak ada offset putih 
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.top = '0';
-    tempContainer.style.left = '0';
-    tempContainer.style.width = 'max-content'; // Paksa melebar sempurna tanpa terpotong
-    tempContainer.style.background = '#fff';
-    tempContainer.style.zIndex = '-9999';
-    
-    tempContainer.appendChild(cloneCard);
-    document.body.appendChild(tempContainer);
-    
-    // 3. Seting elemen-elemen di dalam clone
-    const cloneHeader = cloneCard.querySelector('#print-header');
-    const cloneToolbar = cloneCard.querySelector('.table-toolbar');
-    const cloneScroller = cloneCard.querySelector('.table-scroller');
-    const cloneTable = cloneCard.querySelector('#prioritas-table');
-    const cloneSubtitle = cloneCard.querySelector('#print-subtitle');
-    
-    cloneHeader.style.display = 'block';
-    cloneToolbar.style.display = 'none';
-    cloneScroller.style.maxHeight = 'none';
-    cloneScroller.style.overflow = 'visible';
-    
-    // 4. Logika filter kolom
-    cloneTable.className = '';
-    if (mode === 'biaya') {
-        cloneTable.classList.add('tab-biaya');
-        cloneSubtitle.innerText = 'Distribusi Berdasarkan Anggaran Biaya (Rp) - PTPN IV Regional 1 Tahun 2026';
-    } else if (mode === 'paket') {
-        cloneTable.classList.add('tab-paket');
-        cloneSubtitle.innerText = 'Distribusi Berdasarkan Jumlah Pengadaan Paket - PTPN IV Regional 1 Tahun 2026';
-    } else {
-        cloneSubtitle.innerText = 'Distribusi Komprehensif (Biaya & Paket) - PTPN IV Regional 1 Tahun 2026';
-    }
+    // ── Ambil data rows dari tabel yang ada ──
+    const origTable = document.getElementById('prioritas-table');
+    const origRows  = origTable.querySelectorAll('tbody tr');
 
-    // 5. Eksekusi html2pdf
-    const opt = {
-        margin:       0.3,
-        filename:     `Laporan_Investasi_${mode}_2026.pdf`,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
-        jsPDF:        { unit: 'in', format: mode === 'semua' ? 'a3' : 'a4', orientation: 'landscape' }
+    // Ambil data dari PHP records untuk membangun tabel baru
+    const records = @json($records);
+
+    // Helper format angka
+    const fmtRp = v => (v === null || v == 0) ? '<span class="val-dim-pdf">—</span>' : Number(v).toLocaleString('id-ID');
+    const fmtPk = v => (v === null || v == 0) ? '<span class="val-dim-pdf">—</span>' : v;
+    const fmtBg = v => {
+        if (v === null || v == 0) return '<span class="val-dim-pdf">—</span>';
+        const n = parseFloat(v);
+        const cls = n >= 80 ? 'badge-pdf-green' : (n >= 50 ? 'badge-pdf-amber' : 'badge-pdf-red');
+        return `<span class="${cls}">${n.toFixed(1)}%</span>`;
     };
 
-    html2pdf().set(opt).from(tempContainer).save().then(() => {
-        // Hapus elemen clone bersih setelah PDF tercipta
-        document.body.removeChild(tempContainer);
-    });
+    // Kolom stage
+    const stages = [
+        { label: 'RKAP 2026 Rekg 045 Setahun (Prioritas)', cls: 'h-rkap-pdf',
+          bKeys: ['rkap_biaya_1','rkap_biaya_2','rkap_biaya_3','rkap_biaya_4'],
+          pKeys: ['rkap_paket_1','rkap_paket_2','rkap_paket_3','rkap_paket_4'] },
+        { label: 'Dokumen di Unit', cls: 'h-doku-pdf',
+          bKeys: ['doku_biaya_1','doku_biaya_2','doku_biaya_3','doku_biaya_4'],
+          pKeys: ['doku_paket_1','doku_paket_2','doku_paket_3','doku_paket_4'] },
+        { label: 'Sudah diajukan Unit (Bag Tekpol)', cls: 'h-tekpol-pdf',
+          bKeys: ['tekpol_biaya_1','tekpol_biaya_2','tekpol_biaya_3','tekpol_biaya_4'],
+          pKeys: ['tekpol_paket_1','tekpol_paket_2','tekpol_paket_3','tekpol_paket_4'] },
+        { label: 'HPS/Pengadaan', cls: 'h-hps-pdf',
+          bKeys: ['hps_biaya_1','hps_biaya_2','hps_biaya_3','hps_biaya_4'],
+          pKeys: ['hps_paket_1','hps_paket_2','hps_paket_3','hps_paket_4'] },
+        { label: 'SPPBJ/Kontrak', cls: 'h-sppbj-pdf',
+          bKeys: ['sppbj_biaya_1','sppbj_biaya_2','sppbj_biaya_3','sppbj_biaya_4'],
+          pKeys: ['sppbj_paket_1','sppbj_paket_2','sppbj_paket_3','sppbj_paket_4'] },
+    ];
+        const pctLabels    = ['Posisi Unit','Diterima Tekpol','HPS/Pengadaan','SPPBJ/Kontrak'];
+
+    // ── Builder tabel HTML ──
+    function buildTable(mode) {
+        const isBiaya = mode === 'biaya';
+        const keys    = isBiaya ? stages.map(s=>s.bKeys) : stages.map(s=>s.pKeys);
+        const pctKeys = isBiaya
+            ? ['pct_belum_biaya','pct_diaj_biaya','pct_hps_biaya','pct_sppbj_biaya']
+            : ['pct_belum_paket','pct_diaj_paket','pct_hps_paket','pct_sppbj_paket'];
+        const subClass = isBiaya ? 'sub-biaya-pdf' : 'sub-paket-pdf';
+        const qClass   = isBiaya ? 'q-biaya-pdf' : 'q-paket-pdf';
+        const subLabel = isBiaya ? 'Σ Biaya (Rp)' : 'Σ Paket';
+        const fmt = isBiaya ? fmtRp : fmtPk;
+
+        let html = '<table>';
+        // ── Header Baris 1: nama stage + progress group
+        html += '<thead><tr>';
+        html += '<th rowspan="3" style="text-align:left;vertical-align:middle;">Unit Kerja</th>';
+        stages.forEach(s => {
+            html += `<th colspan="4" class="${s.cls}">${s.label}</th>`;
+        });
+        html += `<th colspan="${pctLabels.length}" class="h-pct-pdf" rowspan="2">%ProgressThdp RKAP setahun (%)</th>`;
+        html += '</tr>';
+
+        // ── Header Baris 2: sub-label sesuai mode per stage
+        html += '<tr>';
+        stages.forEach(() => {
+            html += `<th colspan="4" class="${subClass}">${subLabel}</th>`;
+        });
+        html += '</tr>';
+
+        // ── Header Baris 3: kuartal 1 2 3 4 per stage + label pct
+        html += '<tr>';
+        stages.forEach(() => {
+            html += `<th class="${qClass}">1</th><th class="${qClass}">2</th><th class="${qClass}">3</th><th class="${qClass}">4</th>`;
+        });
+        pctLabels.forEach(l => { html += `<th class="q-pct-pdf">${l}</th>`; });
+        html += '</tr></thead>';
+        // Body rows
+        html += '<tbody>';
+        records.forEach(row => {
+            const isSubtotal = row._is_subtotal;
+            const trCls = isSubtotal ? 'pdf-subtotal' : '';
+            html += `<tr class="${trCls}">`;
+            html += `<td class="col-unit">${row.unit_kerja || '—'}</td>`;
+            keys.forEach((bk) => {
+                bk.forEach((k) => {
+                    const bg = isBiaya ? '#f7fbf2' : '#fff9f0';
+                    html += `<td style="background:${bg};">${fmt(row[k])}</td>`;
+                });
+            });
+            pctKeys.forEach((k) => {
+                html += `<td style="text-align:center;background:#f2f7fc;">${fmtBg(row[k])}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        return html;
+    }
+
+    // ── Bangun container PDF ──
+    const now = new Date();
+    const tgl = `${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
+
+    const container = document.createElement('div');
+    container.id = 'pdf-export-container';
+    container.innerHTML = `
+        <div class="pdf-doc-header">
+            <h2>Laporan Progress Realisasi Investasi Prioritas</h2>
+            <p>PTPN IV Regional I — Tahun 2026 &nbsp;|&nbsp; Dicetak: ${tgl}</p>
+        </div>
+        <div class="pdf-section">
+            <div class="pdf-section-title">📊 Monitoring Biaya (Rp)</div>
+            ${buildTable('biaya')}
+        </div>
+        <div class="pdf-section" style="margin-top:10px;">
+            <div class="pdf-section-title">📦 Monitoring Paket</div>
+            ${buildTable('paket')}
+        </div>
+    `;
+
+    // ── Pasang ke DOM (offscreen) ──
+    const tempWrap = document.createElement('div');
+    tempWrap.style.cssText = 'position:fixed;top:0;left:-99999px;background:#fff;padding:16px;width:1060px;';
+    tempWrap.appendChild(container);
+    document.body.appendChild(tempWrap);
+
+    setTimeout(() => {
+        const opt = {
+            margin:      [0.25, 0.25],
+            filename:    `Laporan_Investasi_Prioritas_${now.getFullYear()}.pdf`,
+            image:       { type: 'jpeg', quality: 0.97 },
+            html2canvas: { scale: 2, useCORS: true, logging: false },
+            jsPDF:       { unit: 'in', format: 'a3', orientation: 'landscape' }
+        };
+        html2pdf().set(opt).from(container).save().then(() => {
+            document.body.removeChild(tempWrap);
+            btn.innerHTML = originalHTML;
+            btn.style.opacity = '1';
+            btn.disabled = false;
+        }).catch(err => {
+            console.error('PDF Error:', err);
+            document.body.removeChild(tempWrap);
+            btn.innerHTML = originalHTML;
+            btn.style.opacity = '1';
+            btn.disabled = false;
+        });
+    }, 500);
 }
 
 // ── Chart.js Global Defaults ─────────────────────────────
