@@ -702,6 +702,8 @@ main {
 }
 #pdf-export-container .pdf-section {
     margin-bottom: 8px;
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 #pdf-export-container .pdf-doc-header {
     text-align: center;
@@ -710,8 +712,13 @@ main {
     border-bottom: 2px solid #cbd5e1;
 }
 #pdf-export-container .pdf-doc-header h2 {
-    margin:0; font-size:11pt; font-weight:800; color:#1e293b;
-    text-transform:uppercase; letter-spacing:0.5px;
+    margin:0;
+    font-size:10.5pt;
+    font-weight:800;
+    color:#1e293b;
+    text-transform:uppercase;
+    letter-spacing:0.35px;
+    line-height:1.35;
 }
 #pdf-export-container .pdf-doc-header p {
     margin:2px 0 0; font-size:7.5pt; color:#475569; font-weight:600;
@@ -748,6 +755,10 @@ main {
     background: #eff6ff !important;
     font-weight: 800; color: #1e40af;
     border-bottom: 1pt solid #3b82f6;
+}
+#pdf-export-container table tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
 }
 #pdf-export-container .h-rkap-pdf,
 #pdf-export-container .h-doku-pdf,
@@ -1315,7 +1326,7 @@ function exportPDF() {
     container.id = 'pdf-export-container';
     container.innerHTML = `
         <div class="pdf-doc-header">
-            <h2>Laporan Progress Realisasi Investasi Prioritas</h2>
+            <h2>Laporan Progress Investasi Off Farm Rekg 045 PKS dan PPIS PT Perkebunan Nusantara IV Regional I</h2>
             <p>PTPN IV Regional I — Tahun 2026 &nbsp;|&nbsp; Dicetak: ${tgl}</p>
         </div>
         <div class="pdf-section">
@@ -1340,7 +1351,8 @@ function exportPDF() {
             filename:    `Laporan_Investasi_Prioritas_${now.getFullYear()}.pdf`,
             image:       { type: 'jpeg', quality: 0.97 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF:       { unit: 'in', format: 'a3', orientation: 'landscape' }
+            jsPDF:       { unit: 'in', format: 'a3', orientation: 'landscape' },
+            pagebreak:   { mode: ['css', 'legacy'] }
         };
         html2pdf().set(opt).from(container).save().then(() => {
             document.body.removeChild(tempWrap);
